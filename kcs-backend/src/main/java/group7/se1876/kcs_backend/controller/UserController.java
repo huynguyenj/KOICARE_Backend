@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api")
@@ -28,6 +30,16 @@ public class UserController {
       return apiResponse;
     }
 
+    //Get users
+    @GetMapping("/getUsers")
+    public ApiResponse<List<UserResponse>> getAllUser(){
+        ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
+
+        apiResponse.setResult(userService.getAllUser());
+
+        return apiResponse;
+
+    }
     //Get user info
     @GetMapping("{id}")
     public  ApiResponse<UserResponse> getUser(@PathVariable("id") Long userId ){

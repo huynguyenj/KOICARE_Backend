@@ -15,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -52,6 +55,16 @@ public class UserImpl implements  UserService{
                 .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
         return UserMapper.mapToUserResponse(user);
     }
+
+    @Override
+    public List<UserResponse> getAllUser() {
+
+        List<User> users = userRepository.findAll();
+
+        return users.stream().map((user) -> userMapper.mapToUserResponse(user))
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public UserResponse updateUser(Long userId, UserUpdateRequest newInfoUser) {
