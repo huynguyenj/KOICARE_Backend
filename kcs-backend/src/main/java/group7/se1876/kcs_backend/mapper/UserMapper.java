@@ -3,8 +3,9 @@ package group7.se1876.kcs_backend.mapper;
 import group7.se1876.kcs_backend.dto.request.UserDto;
 import group7.se1876.kcs_backend.dto.response.UserResponse;
 import group7.se1876.kcs_backend.entity.User;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class UserMapper {
     public static UserDto mapToUserDto(User user){
         return new UserDto(
@@ -23,7 +24,8 @@ public class UserMapper {
                 userDto.getPassword(),
                 userDto.getPhone(),
                 userDto.getEmail(),
-                userDto.isStatus()
+                userDto.isStatus(),
+                null
         );
     }
     public static UserResponse mapToUserResponse(User user){
@@ -32,7 +34,8 @@ public class UserMapper {
                 user.getUserName(),
                 user.getPhone(),
                 user.getEmail(),
-                user.isStatus()
+                user.isStatus(),
+                user.getRoles()
         );
     }
 }

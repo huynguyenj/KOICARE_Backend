@@ -1,6 +1,7 @@
 package group7.se1876.kcs_backend.controller;
 
 import group7.se1876.kcs_backend.dto.request.UserDto;
+import group7.se1876.kcs_backend.dto.request.UserUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.UserResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.UserService;
@@ -18,11 +19,11 @@ public class UserController {
 
     //Register
     @PostMapping("/user")
-    public ApiResponse<UserDto> register(@RequestBody @Valid UserDto userDto){
+    public ApiResponse<UserResponse> register(@RequestBody @Valid UserDto userDto){
 
-        ApiResponse<UserDto> apiResponse = new ApiResponse<>();
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
 
-        apiResponse.setResult(userService.register(userDto));
+            apiResponse.setResult(userService.register(userDto));
 
       return apiResponse;
     }
@@ -35,5 +36,16 @@ public class UserController {
         apiResponse.setResult(userService.getUser(userId));
 
         return apiResponse;
+    }
+
+    //Update user
+    @PutMapping("/update_User/{userid}")
+    public ApiResponse<UserResponse> updateUser (@PathVariable Long userId, @RequestBody UserUpdateRequest request){
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+
+        apiResponse.setResult(userService.updateUser(userId, request));
+
+        return apiResponse;
+
     }
 }

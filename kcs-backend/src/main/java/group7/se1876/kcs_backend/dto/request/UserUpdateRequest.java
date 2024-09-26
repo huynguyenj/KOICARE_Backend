@@ -1,23 +1,24 @@
-package group7.se1876.kcs_backend.dto.response;
-
+package group7.se1876.kcs_backend.dto.request;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
+public class UserUpdateRequest {
     private Long userId;
     private String userName;
+    @Size(min = 8, message = "INVALID_PASSWORD")
+    private String password;
     private Long phone;
     private String email;
     private boolean status;
-    private Set<String> roles;
+    private List<String> roles;
 }
