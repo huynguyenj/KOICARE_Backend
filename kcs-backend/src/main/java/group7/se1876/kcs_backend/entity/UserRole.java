@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 
-@Table(name = "role")
+
 public class UserRole {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

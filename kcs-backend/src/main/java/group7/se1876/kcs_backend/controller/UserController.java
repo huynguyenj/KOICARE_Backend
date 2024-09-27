@@ -21,7 +21,7 @@ public class UserController {
     private UserService userService;
 
     //Register
-    @PostMapping("/user")
+    @PostMapping("/register")
     public ApiResponse<UserResponse> register(@RequestBody @Valid UserDto userDto){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();

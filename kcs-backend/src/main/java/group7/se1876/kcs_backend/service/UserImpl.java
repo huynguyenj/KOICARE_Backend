@@ -31,6 +31,7 @@ public class UserImpl implements  UserService{
     private UserRepository userRepository;
     private UserMapper userMapper;
 
+    //Register
     @Override
     public UserResponse register(UserDto userRequest) {
 
@@ -54,6 +55,7 @@ public class UserImpl implements  UserService{
         return userMapper.mapToUserResponse(saveUser);
     }
 
+    //Get user
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public UserResponse getUser(Long userId) {
@@ -75,6 +77,7 @@ public class UserImpl implements  UserService{
         return userMapper.mapToUserResponse(user);
     }
 
+    //Get all user
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<UserResponse> getAllUser() {
@@ -86,6 +89,7 @@ public class UserImpl implements  UserService{
     }
 
 
+    //Update user
     @Override
     public UserResponse updateUser(Long userId, UserUpdateRequest newInfoUser) {
 
