@@ -1,6 +1,7 @@
 package group7.se1876.kcs_backend.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 //Global exception (in service layer)
 
 public class GlobalExceptionHandle {
+
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException exception){
 
@@ -23,7 +25,6 @@ public class GlobalExceptionHandle {
 
 
     @ExceptionHandler(value = AppException.class)
-
     ResponseEntity<ApiResponse> handleRuntimeException(AppException exception){
 
         ErrorCode errorCode = exception.getErrorCode();
@@ -32,7 +33,7 @@ public class GlobalExceptionHandle {
         apiResponse.setCode(errorCode.getCode());
         apiResponse.setMessage(errorCode.getMessage());
 
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
 
 //Exception mostly in dto validation
@@ -53,5 +54,16 @@ public class GlobalExceptionHandle {
         apiResponse.setMessage(errorCode.getMessage());
 
         return ResponseEntity.badRequest().body(apiResponse);
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    ResponseEntity<ApiResponse> handleExceptionAccessDenied(AccessDeniedException exception){
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setMessage(errorCode.getMessage());
+
+        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
 }

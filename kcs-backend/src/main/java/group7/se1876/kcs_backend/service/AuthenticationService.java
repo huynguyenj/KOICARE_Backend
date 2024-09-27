@@ -9,6 +9,7 @@ import group7.se1876.kcs_backend.dto.request.AuthenticationRequest;
 import group7.se1876.kcs_backend.dto.request.VerifyTokenRequest;
 import group7.se1876.kcs_backend.dto.response.AuthenticationResponse;
 import group7.se1876.kcs_backend.dto.response.VerifyTokenResponse;
+import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.repository.UserRepository;
@@ -21,11 +22,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Slf4j
 @Service
@@ -40,10 +43,10 @@ public class AuthenticationService {
     protected String SIGNAL_KEY;
 
     // Authentication when login
-    public AuthenticationResponse authenticate(AuthenticationRequest request){
+    public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest){
 
         //Find username from database
-        var user = userRepository.findByUserName(request.getUserName())
+        var user = userRepository.findByUserName(authenticationRequest.getUserName())
                 .orElseThrow(() -> {
                     return new AppException(ErrorCode.USER_NOT_EXISTED);
                 });
@@ -51,13 +54,13 @@ public class AuthenticationService {
         //Check password is match to password in database by BCrypt password
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         //Compare password from request and from database
-        boolean authendicated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        boolean authendicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
 
         if (!authendicated)
             throw new AppException(ErrorCode.UNAUTHENDICATED);
 
         //Create token for user after checked password successfully
-        var token = generateToken(request.getUserName());
+        var token = generateToken(user);
         AuthenticationResponse authRes = new AuthenticationResponse();
 
         authRes.setToken(token);
@@ -68,21 +71,21 @@ public class AuthenticationService {
     }
 
     //Create token
-    private String generateToken(String username){
+    private String generateToken(User user){
 
         //Create header
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
         //Create payload
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
+                .subject(user.getUserName())
                 .issuer("")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         //Set time for token
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli() // expired in 1 hour
                 ))
-                .claim("customerClaimed","Customer") // info of token claim
+                .claim("scope",buildScope(user)) // info of token claim
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -103,9 +106,9 @@ public class AuthenticationService {
     }
 
     //Verify token of user already login
-    public VerifyTokenResponse verifyToken(VerifyTokenRequest request) throws ParseException, JOSEException {
+    public VerifyTokenResponse verifyToken(VerifyTokenRequest verifyTokenRequest) throws ParseException, JOSEException {
 
-        var token = request.getToken();
+        var token = verifyTokenRequest.getToken();
 
         JWSVerifier verifier = new MACVerifier(SIGNAL_KEY.getBytes());
 
@@ -119,5 +122,19 @@ public class AuthenticationService {
 
         return verifyTokenResponse;
 
+    }
+
+    //Build scope
+    private String buildScope(User user){
+        // StringJoiner make a discrete info (can be arrays, list, object) to a string
+        StringJoiner stringJoiner = new StringJoiner(" "); // each string add will separated by " "
+            if (!CollectionUtils.isEmpty(user.getRoles())){
+               //Role define to be a set so we make it in to a string separate by " "
+                user.getRoles().forEach(s -> stringJoiner.add(s));
+                // <==>for (String role : user.getRoles()) {
+                //              stringJoiner.add(role);
+                //}
+            }
+            return stringJoiner.toString();
     }
 }
