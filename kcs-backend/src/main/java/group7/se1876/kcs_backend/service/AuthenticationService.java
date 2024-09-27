@@ -43,10 +43,10 @@ public class AuthenticationService {
     protected String SIGNAL_KEY;
 
     // Authentication when login
-    public AuthenticationResponse authenticate(AuthenticationRequest request){
+    public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest){
 
         //Find username from database
-        var user = userRepository.findByUserName(request.getUserName())
+        var user = userRepository.findByUserName(authenticationRequest.getUserName())
                 .orElseThrow(() -> {
                     return new AppException(ErrorCode.USER_NOT_EXISTED);
                 });
@@ -54,7 +54,7 @@ public class AuthenticationService {
         //Check password is match to password in database by BCrypt password
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         //Compare password from request and from database
-        boolean authendicated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        boolean authendicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
 
         if (!authendicated)
             throw new AppException(ErrorCode.UNAUTHENDICATED);
@@ -106,9 +106,9 @@ public class AuthenticationService {
     }
 
     //Verify token of user already login
-    public VerifyTokenResponse verifyToken(VerifyTokenRequest request) throws ParseException, JOSEException {
+    public VerifyTokenResponse verifyToken(VerifyTokenRequest verifyTokenRequest) throws ParseException, JOSEException {
 
-        var token = request.getToken();
+        var token = verifyTokenRequest.getToken();
 
         JWSVerifier verifier = new MACVerifier(SIGNAL_KEY.getBytes());
 
@@ -126,8 +126,10 @@ public class AuthenticationService {
 
     //Build scope
     private String buildScope(User user){
+        // StringJoiner make a discrete info (can be arrays, list, object) to a string
         StringJoiner stringJoiner = new StringJoiner(" "); // each string add will separated by " "
             if (!CollectionUtils.isEmpty(user.getRoles())){
+               //Role define to be a set so we make it in to a string separate by " "
                 user.getRoles().forEach(s -> stringJoiner.add(s));
                 // <==>for (String role : user.getRoles()) {
                 //              stringJoiner.add(role);
