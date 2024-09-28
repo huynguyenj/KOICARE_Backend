@@ -3,11 +3,13 @@ package group7.se1876.kcs_backend.service;
 import group7.se1876.kcs_backend.dto.request.UserDto;
 import group7.se1876.kcs_backend.dto.request.UserUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.UserResponse;
+import group7.se1876.kcs_backend.entity.RoleDetail;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.enums.Role;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.UserMapper;
+import group7.se1876.kcs_backend.repository.RoleRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 public class UserImpl implements  UserService{
 
     private UserRepository userRepository;
+    private RoleRepository roleRepository;
     private UserMapper userMapper;
 
     //Register
@@ -44,9 +47,16 @@ public class UserImpl implements  UserService{
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
-        //Set role for user is USER ROLE
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
+        //Set new role for user is USER ROLE
+        RoleDetail userRole = roleRepository.findByRoleType(Role.USER.name())
+                .orElseGet(()->{
+                    RoleDetail newRole = new RoleDetail();
+                    newRole.setRoleType(Role.USER.name());
+                    return roleRepository.save(newRole);
+                });
+
+        HashSet<RoleDetail> roles = new HashSet<>();
+        roles.add(userRole);
         user.setRoles(roles);
 
         // Save data already map to entity to database
@@ -101,5 +111,14 @@ public class UserImpl implements  UserService{
         user.setEmail(newInfoUser.getEmail());
 
         return userMapper.mapToUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public void deleteUser(Long userId) {
+       User user = userRepository.findById(userId)
+               .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+       userRepository.delete(user);
+
     }
 }

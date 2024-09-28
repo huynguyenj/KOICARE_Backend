@@ -1,7 +1,9 @@
 package group7.se1876.kcs_backend.configuration;
 
+import group7.se1876.kcs_backend.entity.RoleDetail;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.enums.Role;
+import group7.se1876.kcs_backend.repository.RoleRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +24,17 @@ public class ApplicationInitConfig {
     private final PasswordEncoder passwordEncoder;
 
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository){
+    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository){
         return args -> {
                if(userRepository.findByUserName("admin").isEmpty()) {
                    User user = new User();
-                   var roles = new HashSet<String>();
-                   roles.add(Role.ADMIN.name());
+                   var roles = new HashSet<RoleDetail>();
+
+                   //Save userRoleType to UserRole Entity
+                   RoleDetail userRole = new RoleDetail();
+                   userRole.setRoleType(Role.ADMIN.name());
+                   roleRepository.save(userRole);
+                   roles.add(userRole);
 
                    //create admin acc
                    user.setUserName("admin");

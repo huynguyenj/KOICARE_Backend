@@ -32,15 +32,16 @@ public class SecurityConfig {
     @Value("${jwt.signerKey}")
     private String SIGNAL_KEY;
 
-    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken"};
+    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register"};
 //    private final String[] ADMIN_ENDPOINTS = {"/api/getUsers"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request ->
-                request .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+        httpSecurity.authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
 //                        .requestMatchers(HttpMethod.GET, ADMIN_ENDPOINTS).hasAuthority("ROLE_ADMIN")
-                        .anyRequest().authenticated()); // any method with PUBLIC_ENDPOINTS is allowed to access without security check
+                        .anyRequest()
+                        .authenticated()); // any method with PUBLIC_ENDPOINTS is allowed to access without security check
 
         //Validate jwt
         httpSecurity.oauth2ResourceServer(oauth2 ->
@@ -87,14 +88,14 @@ public class SecurityConfig {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.addAllowedOrigin("*"); // allow all http can access to backend(not recommend)
-        corsConfiguration.addAllowedMethod("*"); // allow all method in backend can be access by frontend
-        corsConfiguration.addAllowedHeader("*"); // allow header can be access
+        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.addAllowedHeader("*");
 
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**",corsConfiguration);
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
 
-       return new CorsFilter(urlBasedCorsConfigurationSource);
+        return new CorsFilter(urlBasedCorsConfigurationSource);
     }
 
 }

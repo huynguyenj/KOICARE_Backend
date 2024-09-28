@@ -19,5 +19,5 @@ public class UserResponse {
     private Long phone;
     private String email;
     private boolean status;
-    private Set<String> roles;
+    private Set<RoleRespone> roles;
 }

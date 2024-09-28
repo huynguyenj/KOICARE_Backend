@@ -130,7 +130,7 @@ public class AuthenticationService {
         StringJoiner stringJoiner = new StringJoiner(" "); // each string add will separated by " "
             if (!CollectionUtils.isEmpty(user.getRoles())){
                //Role define to be a set so we make it in to a string separate by " "
-                user.getRoles().forEach(s -> stringJoiner.add(s));
+                user.getRoles().forEach(roles -> {stringJoiner.add(roles.getRoleType());});
                 // <==>for (String role : user.getRoles()) {
                 //              stringJoiner.add(role);
                 //}
