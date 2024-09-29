@@ -21,8 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +31,7 @@ public class UserImpl implements  UserService{
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private UserMapper userMapper;
+    private PasswordEncoder passwordEncoder;
 
     //Register
     @Override
@@ -42,6 +41,7 @@ public class UserImpl implements  UserService{
         if(userRepository.existsByUserName(userRequest.getUserName()) || userRepository.existsByEmail(userRequest.getEmail())){
             throw new AppException(ErrorCode.USER_EXISTED);
         }
+
         User user = userMapper.mapToUser(userRequest);
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -102,13 +102,20 @@ public class UserImpl implements  UserService{
     //Update user
     @Override
     public UserResponse updateUser(Long userId, UserUpdateRequest newInfoUser) {
-
+       
             User user = userRepository.findById(userId)
                 .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
 
+
+
         user.setUserName(newInfoUser.getUserName());
-        user.setPassword(newInfoUser.getPassword());
+        user.setPassword(passwordEncoder.encode(newInfoUser.getPassword()));
+        user.setPhone(newInfoUser.getPhone());
         user.setEmail(newInfoUser.getEmail());
+
+//        var roles = roleRepository.findAllById(newInfoUser.getRoles());
+//        user.setRoles(new HashSet<>(roles));
+
 
         return userMapper.mapToUserResponse(userRepository.save(user));
     }
@@ -118,7 +125,7 @@ public class UserImpl implements  UserService{
     public void deleteUser(Long userId) {
        User user = userRepository.findById(userId)
                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
-       userRepository.delete(user);
+       userRepository.deleteById(userId);
 
     }
 }

@@ -66,7 +66,7 @@ public class UserController {
 
     //Update user
     @PutMapping("/update_User/{userid}")
-    public ApiResponse<UserResponse> updateUser (@PathVariable Long userId, @RequestBody UserUpdateRequest request){
+    public ApiResponse<UserResponse> updateUser (@PathVariable("userid") Long userId, @RequestBody UserUpdateRequest request){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
 
@@ -76,15 +76,16 @@ public class UserController {
 
     }
 
+    //Delete user
     @DeleteMapping("/delete/{userid}")
-    public ApiResponse<String> deleteUser(@PathVariable Long userId){
+    public ApiResponse<String> deleteUser(@PathVariable("userid") Long userId){
 
         userService.deleteUser(userId);
 
         ApiResponse<String> result = new ApiResponse<>();
         result.setMessage("Delete succesfully");
 
-        return result;
+            return result;
     }
 
 }
