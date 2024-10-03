@@ -6,15 +6,16 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import group7.se1876.kcs_backend.dto.request.AuthenticationRequest;
+import group7.se1876.kcs_backend.dto.request.LogoutRequest;
 import group7.se1876.kcs_backend.dto.request.VerifyTokenRequest;
 import group7.se1876.kcs_backend.dto.response.AuthenticationResponse;
 import group7.se1876.kcs_backend.dto.response.VerifyTokenResponse;
+import group7.se1876.kcs_backend.entity.InvalidatedToken;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
+import group7.se1876.kcs_backend.repository.InvalidatedTokenRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -37,6 +39,7 @@ import java.util.StringJoiner;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -45,13 +48,12 @@ public class AuthenticationService {
     // Authentication when login
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest){
 
-        //Find username from database
         var user = userRepository.findByUserName(authenticationRequest.getUserName())
                 .orElseThrow(() -> {
                     return new AppException(ErrorCode.USER_NOT_EXISTED);
                 });
 
-        //Check password is match to password in database by BCrypt password
+        //Check password is match to password in database by BCrypt algorithm password
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         //Compare password from request and from database
         boolean authendicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
@@ -59,7 +61,7 @@ public class AuthenticationService {
         if (!authendicated)
             throw new AppException(ErrorCode.UNAUTHENDICATED);
 
-        //Create token for user after checked password successfully
+        //Create token for user
         var token = generateToken(user);
         AuthenticationResponse authRes = new AuthenticationResponse();
 
@@ -79,12 +81,13 @@ public class AuthenticationService {
         //Create payload
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUserName())
-                .issuer("")
+                .issuer("koicare.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         //Set time for token
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli() // expired in 1 hour
                 ))
+                .jwtID(UUID.randomUUID().toString()) // token ID
                 .claim("scope",buildScope(user)) // info of token claim
                 .build();
 
@@ -109,6 +112,53 @@ public class AuthenticationService {
     public VerifyTokenResponse verifyToken(VerifyTokenRequest verifyTokenRequest) throws ParseException, JOSEException {
 
         var token = verifyTokenRequest.getToken();
+        VerifyTokenResponse verifyTokenResponse = new VerifyTokenResponse();
+
+        boolean isValid = true;
+
+        try {
+                tokenCheck(token);
+        }catch (AppException e){
+                isValid = false;
+        }
+            verifyTokenResponse.setValid(isValid);
+
+        return verifyTokenResponse;
+
+    }
+
+    //Build scope for token
+    private String buildScope(User user){
+        // StringJoiner make a discrete infomation (can be arrays, list, object) to a string
+        StringJoiner stringJoiner = new StringJoiner(" ");
+
+        if (!CollectionUtils.isEmpty(user.getRoles())){
+               //Role define to be a set so we make it in to a string and separate by " "
+                user.getRoles().forEach(roles -> {stringJoiner.add(roles.getRoleType());});
+
+            }
+            return stringJoiner.toString();
+    }
+
+    //Logout
+    public void logout(LogoutRequest request) throws ParseException, JOSEException {
+
+        var signToken = tokenCheck(request.getToken());
+
+        String jit = signToken.getJWTClaimsSet().getJWTID();
+        Date expiredTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidToken = new InvalidatedToken();
+        invalidToken.setTokenId(jit);
+        invalidToken.setTimeExpired(expiredTime);
+
+        invalidatedTokenRepository.save(invalidToken);
+
+
+    }
+
+    //Check token information
+    private SignedJWT tokenCheck(String token) throws JOSEException, ParseException {
 
         JWSVerifier verifier = new MACVerifier(SIGNAL_KEY.getBytes());
 
@@ -117,24 +167,13 @@ public class AuthenticationService {
         Date expityTime = signedJWT.getJWTClaimsSet().getExpirationTime(); // Check date expired of token
         var verified = signedJWT.verify(verifier); // check token sign from request equal to token signKey we create in application.properties
 
-        VerifyTokenResponse verifyTokenResponse = new VerifyTokenResponse();
-        verifyTokenResponse.setValid(verified && expityTime.after(new Date()));
+        //Check token date and data of token
+        if (!(verified && expityTime.after(new Date())))
+            throw new AppException(ErrorCode.UNAUTHENDICATED);
 
-        return verifyTokenResponse;
+        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+            throw new AppException(ErrorCode.UNAUTHORIZED);
 
-    }
-
-    //Build scope
-    private String buildScope(User user){
-        // StringJoiner make a discrete info (can be arrays, list, object) to a string
-        StringJoiner stringJoiner = new StringJoiner(" "); // each string add will separated by " "
-            if (!CollectionUtils.isEmpty(user.getRoles())){
-               //Role define to be a set so we make it in to a string separate by " "
-                user.getRoles().forEach(roles -> {stringJoiner.add(roles.getRoleType());});
-                // <==>for (String role : user.getRoles()) {
-                //              stringJoiner.add(role);
-                //}
-            }
-            return stringJoiner.toString();
+        return signedJWT;
     }
 }

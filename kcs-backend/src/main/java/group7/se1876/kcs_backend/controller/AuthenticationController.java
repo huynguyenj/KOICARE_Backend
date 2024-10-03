@@ -2,13 +2,13 @@ package group7.se1876.kcs_backend.controller;
 
 import com.nimbusds.jose.JOSEException;
 import group7.se1876.kcs_backend.dto.request.AuthenticationRequest;
+import group7.se1876.kcs_backend.dto.request.LogoutRequest;
 import group7.se1876.kcs_backend.dto.request.VerifyTokenRequest;
 import group7.se1876.kcs_backend.dto.response.AuthenticationResponse;
 import group7.se1876.kcs_backend.dto.response.VerifyTokenResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.AuthenticationService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -50,5 +50,13 @@ public class AuthenticationController {
         apiResponse.setResult(verifyTokenResponse);
 
         return apiResponse;
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<String> logoutUser(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+
+         authenticationService.logout(request);
+
+        return new ApiResponse<>();
     }
 }

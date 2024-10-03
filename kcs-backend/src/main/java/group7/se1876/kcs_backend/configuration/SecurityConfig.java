@@ -1,6 +1,7 @@
 package group7.se1876.kcs_backend.configuration;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+
 
 import javax.crypto.spec.SecretKeySpec;
 
@@ -32,8 +33,10 @@ public class SecurityConfig {
 
     @Value("${jwt.signerKey}")
     private String SIGNAL_KEY;
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
 
-    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register"};
+    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register","/auth/logout"};
 //    private final String[] ADMIN_ENDPOINTS = {"/api/getUsers"};
 
     @Bean
@@ -47,7 +50,7 @@ public class SecurityConfig {
 
         //Validate jwt
         httpSecurity.oauth2ResourceServer(oauth2 ->
-                    oauth2.jwt(jwtConfigurer ->jwtConfigurer.decoder(jwtDecoder())
+                    oauth2.jwt(jwtConfigurer ->jwtConfigurer.decoder(customJwtDecoder)
                             .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                             .authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // 401 error handle
                 );
@@ -56,16 +59,6 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    //Decode token to check it valid or not when user login
-    @Bean
-    JwtDecoder jwtDecoder(){
-        // SecretKeySpec with 2 param: our signerKey from application.properties and algorithm that we are using to create token header
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNAL_KEY.getBytes(),"HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
 
     //Set hasAuthority from SCOPE_... to ROLE_... in security spring (default in authority is SCOPE_...)
     @Bean
