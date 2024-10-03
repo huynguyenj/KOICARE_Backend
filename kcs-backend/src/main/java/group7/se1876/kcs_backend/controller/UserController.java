@@ -7,7 +7,6 @@ import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     //Register
-    @PostMapping("/user")
+    @PostMapping("/register")
     public ApiResponse<UserResponse> register(@RequestBody @Valid UserDto userDto){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
@@ -66,7 +65,7 @@ public class UserController {
 
     //Update user
     @PutMapping("/update_User/{userid}")
-    public ApiResponse<UserResponse> updateUser (@PathVariable Long userId, @RequestBody UserUpdateRequest request){
+    public ApiResponse<UserResponse> updateUser (@PathVariable("userid") Long userId, @RequestBody UserUpdateRequest request){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
 
@@ -74,6 +73,18 @@ public class UserController {
 
         return apiResponse;
 
+    }
+
+    //Delete user
+    @DeleteMapping("/delete/{userid}")
+    public ApiResponse<String> deleteUser(@PathVariable("userid") Long userId){
+
+        userService.deleteUser(userId);
+
+        ApiResponse<String> result = new ApiResponse<>();
+        result.setMessage("Delete succesfully");
+
+            return result;
     }
 
 }

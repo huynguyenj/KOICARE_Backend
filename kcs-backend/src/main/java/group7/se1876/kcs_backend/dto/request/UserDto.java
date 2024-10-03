@@ -1,6 +1,5 @@
 package group7.se1876.kcs_backend.dto.request;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

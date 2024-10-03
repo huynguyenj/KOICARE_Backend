@@ -6,17 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 
-@Table(name = "role")
-public class UserRole {
+
+public class RoleDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userRoleId;
-    private int userId;
-    private String userType;
+    private Long userRoleId;
+    private String roleType;
 }

@@ -3,11 +3,13 @@ package group7.se1876.kcs_backend.service;
 import group7.se1876.kcs_backend.dto.request.UserDto;
 import group7.se1876.kcs_backend.dto.request.UserUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.UserResponse;
+import group7.se1876.kcs_backend.entity.RoleDetail;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.enums.Role;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.UserMapper;
+import group7.se1876.kcs_backend.repository.RoleRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,8 +29,11 @@ import java.util.stream.Collectors;
 public class UserImpl implements  UserService{
 
     private UserRepository userRepository;
+    private RoleRepository roleRepository;
     private UserMapper userMapper;
+    private PasswordEncoder passwordEncoder;
 
+    //Register
     @Override
     public UserResponse register(UserDto userRequest) {
 
@@ -38,14 +41,22 @@ public class UserImpl implements  UserService{
         if(userRepository.existsByUserName(userRequest.getUserName()) || userRepository.existsByEmail(userRequest.getEmail())){
             throw new AppException(ErrorCode.USER_EXISTED);
         }
+
         User user = userMapper.mapToUser(userRequest);
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
-        //Set role for user is USER ROLE
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
+        //Set new role for user is USER ROLE
+        RoleDetail userRole = roleRepository.findByRoleType(Role.USER.name())
+                .orElseGet(()->{
+                    RoleDetail newRole = new RoleDetail();
+                    newRole.setRoleType(Role.USER.name());
+                    return roleRepository.save(newRole);
+                });
+
+        HashSet<RoleDetail> roles = new HashSet<>();
+        roles.add(userRole);
         user.setRoles(roles);
 
         // Save data already map to entity to database
@@ -54,6 +65,7 @@ public class UserImpl implements  UserService{
         return userMapper.mapToUserResponse(saveUser);
     }
 
+    //Get user
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public UserResponse getUser(Long userId) {
@@ -75,6 +87,7 @@ public class UserImpl implements  UserService{
         return userMapper.mapToUserResponse(user);
     }
 
+    //Get all user
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<UserResponse> getAllUser() {
@@ -86,16 +99,33 @@ public class UserImpl implements  UserService{
     }
 
 
+    //Update user
     @Override
     public UserResponse updateUser(Long userId, UserUpdateRequest newInfoUser) {
-
+       
             User user = userRepository.findById(userId)
                 .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
 
+
+
         user.setUserName(newInfoUser.getUserName());
-        user.setPassword(newInfoUser.getPassword());
+        user.setPassword(passwordEncoder.encode(newInfoUser.getPassword()));
+        user.setPhone(newInfoUser.getPhone());
         user.setEmail(newInfoUser.getEmail());
 
+//        var roles = roleRepository.findAllById(newInfoUser.getRoles());
+//        user.setRoles(new HashSet<>(roles));
+
+
         return userMapper.mapToUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public void deleteUser(Long userId) {
+       User user = userRepository.findById(userId)
+               .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+       userRepository.deleteById(userId);
+
     }
 }

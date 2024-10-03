@@ -20,6 +20,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @Column(name = "username", unique = true, columnDefinition = "VARCHAR(255)")
     private String userName;
 
     private String password;
@@ -30,6 +31,10 @@ public class User {
 
     private boolean status;
 
-    private Set<String> roles;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<RoleDetail> roles;
 
 }

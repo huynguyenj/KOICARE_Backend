@@ -12,4 +12,5 @@ public interface UserService {
     UserResponse getMyInfo();
     List<UserResponse >getAllUser();
     UserResponse updateUser(Long userId, UserUpdateRequest newInfoUser);
+    void deleteUser(Long userId);
 }
