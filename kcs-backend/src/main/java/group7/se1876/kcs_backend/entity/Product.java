@@ -33,10 +33,6 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private CategoryProduct category;
 
-    @Column(name = "service_type")
-    @Enumerated(EnumType.STRING)
-    private ServiceType serviceType;
-
     @Column
     private LocalDateTime createAt;
 

@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ProductResponse {
+
     private int id;
     private String productName;
     private double price;

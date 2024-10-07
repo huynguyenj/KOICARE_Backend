@@ -13,5 +13,5 @@ public class ProductRequest {
     private double price;
     private CategoryProduct category;
     private int quantity;
-    private ServiceType serviceType;
+    private int quantityOrdered;
 }

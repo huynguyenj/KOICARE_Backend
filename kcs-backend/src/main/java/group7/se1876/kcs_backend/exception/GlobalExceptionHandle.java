@@ -1,5 +1,6 @@
 package group7.se1876.kcs_backend.exception;
 
+import jakarta.transaction.SystemException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -59,6 +60,36 @@ public class GlobalExceptionHandle {
     @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<ApiResponse> handleExceptionAccessDenied(AccessDeniedException exception){
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setMessage(errorCode.getMessage());
+
+        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+    }
+    @ExceptionHandler(value = SystemException.class)
+    ResponseEntity<ApiResponse> handleSystemException(SystemException exception){
+        ErrorCode errorCode = ErrorCode.UNCATAGORIZED_EXCEPTION;
+
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setMessage(errorCode.getMessage());
+
+        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+    }
+    @ExceptionHandler(value = ItemNotFoundException.class)
+    ResponseEntity<ApiResponse> handleItemNotFoundException(ItemNotFoundException exception){
+        ErrorCode errorCode = ErrorCode.ITEM_NOT_FOUND;
+
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setMessage(errorCode.getMessage());
+
+        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+    }
+    @ExceptionHandler(value = OutOfStockException.class)
+    ResponseEntity<ApiResponse> handleOutOfStockException(OutOfStockException exception){
+        ErrorCode errorCode = ErrorCode.OUT_OF_STOCK;
 
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(errorCode.getCode());
