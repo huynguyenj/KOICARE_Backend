@@ -39,5 +39,6 @@ public enum ErrorCode {
         return message;
     }
 
+
     private HttpStatusCode statusCode;
 }

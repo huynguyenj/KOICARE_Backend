@@ -97,4 +97,14 @@ public class GlobalExceptionHandle {
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
+    @ExceptionHandler(value = ProductAlreadyExistsException.class)
+    ResponseEntity<ApiResponse> handleProductAlreadyExistsException(ProductAlreadyExistsException exception){
+        ErrorCode errorCode = ErrorCode.ITEM_EXISTED;
+
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setCode(errorCode.getCode());
+        apiResponse.setMessage(errorCode.getMessage());
+
+        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+    }
 }

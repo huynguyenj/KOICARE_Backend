@@ -2,6 +2,7 @@ package group7.se1876.kcs_backend.controller;
 
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
+import group7.se1876.kcs_backend.exception.ProductAlreadyExistsException;
 import group7.se1876.kcs_backend.service.ProductService;
 import jakarta.transaction.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("/create")
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) throws SystemException {
-        ProductResponse newProduct = productService.createProduct(productRequest);
-        return ResponseEntity.ok(newProduct);
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) throws ProductAlreadyExistsException {
+        ProductResponse product = productService.createProduct(productRequest);
+        return ResponseEntity.ok(product);
     }
 
     @GetMapping("/all")
@@ -37,12 +38,8 @@ public class ProductController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable int id) {
-        boolean isDeleted = productService.deleteProduct(id);
-        if (isDeleted) {
-            return ResponseEntity.ok("Product deleted successfully!");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        productService.deleteProduct(id);
+        return ResponseEntity.ok("Product deleted successfully");
     }
 
     @PostMapping("/order/{productID}")

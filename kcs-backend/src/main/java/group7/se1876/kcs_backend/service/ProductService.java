@@ -7,9 +7,9 @@ import group7.se1876.kcs_backend.entity.Product;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.exception.ItemNotFoundException;
 import group7.se1876.kcs_backend.exception.OutOfStockException;
+import group7.se1876.kcs_backend.exception.ProductAlreadyExistsException;
 import group7.se1876.kcs_backend.repository.OrderDetailRepository;
 import group7.se1876.kcs_backend.repository.ProductRepository;
-import jakarta.transaction.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +28,7 @@ public class ProductService {
     private OrderDetailRepository orderDetailRepository;
 
 
-    public ProductResponse createProduct(ProductRequest productRequest) throws SystemException {
+    public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
         try {
             Product product = Product.builder()
                     .productName(productRequest.getProductName())
@@ -42,7 +42,7 @@ public class ProductService {
             Product savedProduct = productRepository.save(product);
             return convertToResponse(savedProduct);
         } catch (Exception e) {
-            throw new SystemException(String.valueOf(ErrorCode.ITEM_EXISTED));
+            throw new ProductAlreadyExistsException(String.valueOf(ErrorCode.ITEM_EXISTED));
         }
     }
 
@@ -67,15 +67,15 @@ public class ProductService {
     }
 
 
-    public boolean deleteProduct(int id) {
+    public void deleteProduct(int id) {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
-            product.setDeleted(true);
-            productRepository.save(product);
-            return true;
+            // Perform hard delete by calling delete method of the repository
+            productRepository.delete(product);
+        } else {
+            throw new ItemNotFoundException("Product with ID " + id + " not found.");
         }
-        return false;
     }
     public String orderProduct(int productId, int quantity) {
         Optional<Product> productOptional = productRepository.findById(productId);
