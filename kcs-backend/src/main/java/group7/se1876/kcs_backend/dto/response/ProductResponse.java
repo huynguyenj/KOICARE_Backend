@@ -1,7 +1,6 @@
 package group7.se1876.kcs_backend.dto.response;
 
 import group7.se1876.kcs_backend.enums.CategoryProduct;
-import group7.se1876.kcs_backend.enums.ServiceType;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -7,6 +7,7 @@ import group7.se1876.kcs_backend.enums.KoiSpecies;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -50,6 +51,12 @@ public class KoiFish {
     @Column
     @Enumerated(EnumType.STRING)
     private HealthyStatus healthyStatus;
+
+    @Column(name = "time_feeding")
+    private LocalDateTime timeFeeding;
+
+    @Column(name = "amount_of_food")
+    private double amountOfFood;
 
     @Column
     private String note;

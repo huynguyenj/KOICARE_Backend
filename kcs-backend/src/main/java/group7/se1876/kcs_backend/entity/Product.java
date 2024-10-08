@@ -1,7 +1,6 @@
 package group7.se1876.kcs_backend.entity;
 
 import group7.se1876.kcs_backend.enums.CategoryProduct;
-import group7.se1876.kcs_backend.enums.ServiceType;
 import jakarta.persistence.*;
 import lombok.*;
 
