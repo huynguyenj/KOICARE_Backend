@@ -53,12 +53,14 @@ public class AuthenticationService {
                     return new AppException(ErrorCode.USER_NOT_EXISTED);
                 });
 
+        boolean status = user.isStatus();
+
         //Check password is match to password in database by BCrypt algorithm password
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         //Compare password from request and from database
         boolean authendicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
 
-        if (!authendicated)
+        if (!authendicated || !status)
             throw new AppException(ErrorCode.UNAUTHENDICATED);
 
         //Create token for user
@@ -80,7 +82,7 @@ public class AuthenticationService {
 
         //Create payload
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUserName())
+                .subject(String.valueOf(user.getUserId()))
                 .issuer("koicare.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
