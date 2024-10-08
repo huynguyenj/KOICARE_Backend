@@ -31,12 +31,20 @@ public class UserMapper {
                 userDto.getPhone(),
                 userDto.getEmail(),
                 userDto.isStatus(),
+                null,
                 null
         );
     }
     public static UserResponse mapToUserResponse(User user){
-        Set<RoleRespone> role = user.getRoles().stream()
-                .map(roleDetail -> new RoleRespone(roleDetail.getRoleType())).collect(Collectors.toSet());
+//        Set<RoleRespone> role = user.getRoles().stream()
+//                .map(roleDetail -> new RoleRespone(roleDetail.getRoleType())).collect(Collectors.toSet());
+        Set<RoleRespone> role =
+                (user.getRoles() != null)
+                ? user.getRoles().stream()
+                .map(roleDetail -> new RoleRespone(roleDetail.getRoleType()))
+                .collect(Collectors.toSet())
+                : new HashSet<>();
+        
         return new UserResponse(
                 user.getUserId(),
                 user.getUserName(),
