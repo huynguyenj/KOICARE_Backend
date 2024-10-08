@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -24,10 +26,18 @@ public class Pond {
     private double volume;
     private int drainCount;
     private double pumpCapacity;
+    private double saltAmount;
+    private Date date;
 
-    @OneToMany(mappedBy = "pond",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    // SaltCalculation_ID is a foreign key in the Pond table
-    private Set<SaltCalculation> saltCalculation;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name ="userId", referencedColumnName = "userId")
+    private User user;
 
-
+    @ManyToMany
+    @JoinTable(
+            name = "pond_fish",
+            joinColumns = @JoinColumn(name = "pond_id"),
+            inverseJoinColumns = @JoinColumn(name = "fish_id")
+    )
+    private List<Fish> fish;
 }

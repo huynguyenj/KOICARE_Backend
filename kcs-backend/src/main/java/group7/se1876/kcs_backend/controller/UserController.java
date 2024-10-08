@@ -24,7 +24,6 @@ public class UserController {
     public ApiResponse<UserResponse> register(@RequestBody @Valid UserDto userDto){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-
         apiResponse.setResult(userService.register(userDto));
 
       return apiResponse;
@@ -35,7 +34,6 @@ public class UserController {
     public ApiResponse<List<UserResponse>> getAllUser(){
 
         ApiResponse<List<UserResponse>> apiResponse = new ApiResponse<>();
-
         apiResponse.setResult(userService.getAllUser());
 
         return apiResponse;
@@ -46,7 +44,6 @@ public class UserController {
     public  ApiResponse<UserResponse> getUser(@PathVariable("id") Long userId ){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-
         apiResponse.setResult(userService.getUser(userId));
 
         return apiResponse;
@@ -56,7 +53,6 @@ public class UserController {
     public ApiResponse<UserResponse> getMyInfo(){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-
         apiResponse.setResult(userService.getMyInfo());
 
         return apiResponse;
@@ -68,7 +64,6 @@ public class UserController {
     public ApiResponse<UserResponse> updateUser (@PathVariable("userid") Long userId, @RequestBody UserUpdateRequest request){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-
         apiResponse.setResult(userService.updateUser(userId, request));
 
         return apiResponse;
@@ -85,6 +80,14 @@ public class UserController {
         result.setMessage("Delete succesfully");
 
             return result;
+    }
+    @PutMapping("/setStatus/{userId}/decision")
+    public ApiResponse<UserResponse> setActiceAccount(@PathVariable("userId") Long userId, @RequestParam String decision){
+
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(userService.setStatusAccount(userId,decision));
+
+        return apiResponse;
     }
 
 }

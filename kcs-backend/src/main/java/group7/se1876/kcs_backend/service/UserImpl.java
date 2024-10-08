@@ -79,9 +79,10 @@ public class UserImpl implements  UserService{
     public UserResponse getMyInfo() {
         // When login, info of user will save in Security context holder
         var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
+        Long userId = Long.valueOf(context.getAuthentication().getName());
 
-        User user = userRepository.findByUserName(name)
+
+        User user = userRepository.findById(userId)
                     .orElseThrow(()->new AppException(ErrorCode.USER_NOT_EXISTED));
 
         return userMapper.mapToUserResponse(user);
@@ -106,8 +107,6 @@ public class UserImpl implements  UserService{
             User user = userRepository.findById(userId)
                 .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
 
-
-
         user.setUserName(newInfoUser.getUserName());
         user.setPassword(passwordEncoder.encode(newInfoUser.getPassword()));
         user.setPhone(newInfoUser.getPhone());
@@ -115,7 +114,6 @@ public class UserImpl implements  UserService{
 
 //        var roles = roleRepository.findAllById(newInfoUser.getRoles());
 //        user.setRoles(new HashSet<>(roles));
-
 
         return userMapper.mapToUserResponse(userRepository.save(user));
     }
@@ -127,5 +125,23 @@ public class UserImpl implements  UserService{
                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
        userRepository.deleteById(userId);
 
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+
+    public UserResponse setStatusAccount(Long userId, String decision) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.INVALID_USERID));
+
+        if(decision.equalsIgnoreCase("unactive")){
+            user.setStatus(false);
+        }
+        else{
+            user.setStatus(true);
+        }
+
+    return userMapper.mapToUserResponse(userRepository.save(user));
     }
 }

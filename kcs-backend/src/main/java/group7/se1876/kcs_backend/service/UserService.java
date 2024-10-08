@@ -13,4 +13,5 @@ public interface UserService {
     List<UserResponse >getAllUser();
     UserResponse updateUser(Long userId, UserUpdateRequest newInfoUser);
     void deleteUser(Long userId);
+    UserResponse setStatusAccount(Long userId, String decision);
 }
