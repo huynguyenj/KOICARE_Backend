@@ -26,7 +26,7 @@ public class Pond_KoiFish {
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "koi_fish_id")
-    private KoiFish koiFish;
+    private Fish fish;
 
     @Column(name = "date_added")
     private LocalDateTime dateAdded;

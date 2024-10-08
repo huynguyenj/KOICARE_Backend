@@ -7,6 +7,7 @@ import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,12 +22,11 @@ public class UserController {
 
     //Register
     @PostMapping("/register")
-    public ApiResponse<UserResponse> register(@RequestBody @Valid UserDto userDto){
-
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(userService.register(userDto));
-
-      return apiResponse;
+    public ResponseEntity<ApiResponse<String>> register(@RequestBody @Valid UserDto userDto){
+            userService.register(userDto);
+            return ResponseEntity.ok(ApiResponse.<String>builder()
+                    .result("VERIFY YOUR EMAIL")
+                    .build());
     }
 
     //Get users

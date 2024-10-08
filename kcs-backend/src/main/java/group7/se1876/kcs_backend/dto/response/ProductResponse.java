@@ -15,7 +15,6 @@ public class ProductResponse {
     private double price;
     private CategoryProduct category;
     private int quantity;
-    private ServiceType serviceType;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private boolean isDeleted;
