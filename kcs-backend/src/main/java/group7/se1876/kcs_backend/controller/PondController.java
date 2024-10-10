@@ -26,6 +26,7 @@ public class PondController {
 
     private PondService pondService;
 
+    //Add pond
     @PostMapping("/add_Pond")
     public ApiResponse<PondResponse> createNewPond(@RequestBody AddPondRequest request){
 
@@ -35,6 +36,7 @@ public class PondController {
         return apiResponse;
     }
 
+    //Get all pond
     @GetMapping("/getAllPond")
     public ApiResponse<List<PondResponse>> getAllPonds(){
 
@@ -44,6 +46,16 @@ public class PondController {
         return listPonds;
     }
 
+    @GetMapping("/getPondInfo/{pondid}")
+    public ApiResponse<PondResponse> getPond(@PathVariable("pondid") Long pondId){
+
+        ApiResponse<PondResponse> pondInfo = new ApiResponse<>();
+        pondInfo.setResult(pondService.getPondInfo(pondId));
+
+        return pondInfo;
+    }
+
+    //Update pond
     @PutMapping("/update_Pond/{pondid}")
     public ApiResponse<PondResponse> updatePondInfo(@PathVariable("pondid") Long pondId, @RequestBody PondUpdateRequest pondUpdateRequest){
 
@@ -54,6 +66,7 @@ public class PondController {
 
     }
 
+    //Delete pond
     @DeleteMapping("/delete_Pond/{pondid}")
     public ApiResponse<String> deletePond(@PathVariable("pondid") Long pondId){
 
@@ -64,4 +77,15 @@ public class PondController {
 
         return apiResponse;
     }
+
+    @PutMapping("/addFishToPond/pond/{pondid}/fish/{fishid}")
+    public ApiResponse<PondResponse> updatePondInfo(@PathVariable("pondid") Long pondId, @PathVariable("fishid") Long fishid){
+
+        ApiResponse<PondResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(pondService.addFishToPond(pondId,fishid));
+
+        return apiResponse;
+
+    }
+
 }

@@ -17,9 +17,11 @@ public class FishMapper {
                 request.getFishAge(),
                 request.getFishWeight(),
                 request.getFishGender(),
+                request.getFishHealth(),
                 request.getFishType(),
                 request.getOrigin(),
                 request.getPrice(),
+                null,
                 null
         );
     }
@@ -33,10 +35,12 @@ public class FishMapper {
                 fish.getFishAge(),
                 fish.getFishWeight(),
                 fish.getFishGender(),
+                fish.getFishHealth(),
                 fish.getFishType(),
                 fish.getOrigin(),
                 fish.getPrice()
         );
 
     }
+
 }

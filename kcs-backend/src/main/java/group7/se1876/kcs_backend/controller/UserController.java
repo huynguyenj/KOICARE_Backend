@@ -81,7 +81,8 @@ public class UserController {
 
             return result;
     }
-    @PutMapping("/setStatus/{userId}/decision")
+
+    @PutMapping("/setStatus/{userId}")
     public ApiResponse<UserResponse> setActiceAccount(@PathVariable("userId") Long userId, @RequestParam String decision){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
@@ -90,4 +91,12 @@ public class UserController {
         return apiResponse;
     }
 
+    @PutMapping("/setRole/{userId}")
+    public ApiResponse<UserResponse> setRole(@PathVariable("userId") Long userId, @RequestParam String role){
+
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(userService.setRole(userId,role));
+
+        return apiResponse;
+    }
 }

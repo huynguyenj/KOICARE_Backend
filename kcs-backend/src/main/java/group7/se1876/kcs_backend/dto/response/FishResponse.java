@@ -18,7 +18,9 @@ public class FishResponse {
     private int fishAge;
     private double fishWeight;
     private String fishGender;
+    private String fisHHealth;
     private String fishType;
     private String origin;
     private double price;
+
 }
