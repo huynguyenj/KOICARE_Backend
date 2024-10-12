@@ -4,13 +4,13 @@ import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
 import group7.se1876.kcs_backend.entity.OrderDetail;
 import group7.se1876.kcs_backend.entity.Product;
-import group7.se1876.kcs_backend.exception.ErrorCode;
-import group7.se1876.kcs_backend.exception.ItemNotFoundException;
-import group7.se1876.kcs_backend.exception.OutOfStockException;
-import group7.se1876.kcs_backend.exception.ProductAlreadyExistsException;
+import group7.se1876.kcs_backend.entity.User;
+import group7.se1876.kcs_backend.exception.*;
 import group7.se1876.kcs_backend.repository.OrderDetailRepository;
 import group7.se1876.kcs_backend.repository.ProductRepository;
+import group7.se1876.kcs_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,24 +26,30 @@ public class ProductService {
 
     @Autowired
     private OrderDetailRepository orderDetailRepository;
+    @Autowired
+    private UserRepository userRepository;
 
 
     public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
-        try {
-            Product product = Product.builder()
-                    .productName(productRequest.getProductName())
-                    .price(productRequest.getPrice())
-                    .category(productRequest.getCategory())
-                    .quantity(productRequest.getQuantity())
-                    .createAt(LocalDateTime.now())
-                    .updateAt(LocalDateTime.now())
-                    .isDeleted(false)
-                    .build();
-            Product savedProduct = productRepository.save(product);
-            return convertToResponse(savedProduct);
-        } catch (Exception e) {
-            throw new ProductAlreadyExistsException(String.valueOf(ErrorCode.ITEM_EXISTED));
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Optional<Product> productOptional = productRepository.findByProductName(productRequest.getProductName());
+        if (productOptional.isPresent()) {
+            throw new ProductAlreadyExistsException("Product with name " + productRequest.getProductName() + " already exists.");
         }
+        final Product product = Product.builder()
+                .productName(productRequest.getProductName())
+                .price(productRequest.getPrice())
+                .category(productRequest.getCategory())
+                .quantity(productRequest.getQuantity())
+                .createAt(LocalDateTime.now())
+                .updateAt(LocalDateTime.now())
+                .user(user)
+                .build();
+
+        Product savedProduct = productRepository.save(product);
+        return convertToResponse(savedProduct);
     }
 
     public Optional<ProductResponse> updateProduct(int id, ProductRequest productRequest) {
@@ -77,6 +83,12 @@ public class ProductService {
             throw new ItemNotFoundException("Product with ID " + id + " not found.");
         }
     }
+
+    public Optional<ProductResponse> searchProduct(int id) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        return productOptional.map(this::convertToResponse);
+    }
+
     public String orderProduct(int productId, int quantity) {
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isEmpty()) {

@@ -3,7 +3,6 @@ package group7.se1876.kcs_backend.service;
 import group7.se1876.kcs_backend.dto.request.UserDto;
 import group7.se1876.kcs_backend.dto.request.UserUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.UserResponse;
-import group7.se1876.kcs_backend.entity.InvalidatedToken;
 import group7.se1876.kcs_backend.entity.RoleDetail;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.entity.VerificationToken;
@@ -11,14 +10,16 @@ import group7.se1876.kcs_backend.enums.Role;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.UserMapper;
-import group7.se1876.kcs_backend.repository.InvalidatedTokenRepository;
+
 import group7.se1876.kcs_backend.repository.RoleRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
-import group7.se1876.kcs_backend.repository.VerificationTokenRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -36,15 +37,16 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UserImpl implements UserService {
 
-    private final JavaMailSenderImpl mailSender;
+    JavaMailSender mailSender;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
-    private VerificationTokenRepository verificationTokenRepository;
+
 
     //Register
     @Override
@@ -55,7 +57,7 @@ public class UserImpl implements UserService {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
 
-        User user = userMapper.mapToUser(userRequest);
+        User user = UserMapper.mapToUser(userRequest);
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
@@ -74,37 +76,37 @@ public class UserImpl implements UserService {
 
         // Save data already map to entity to database
         User saveUser = userRepository.save(user);
-        String token = UUID.randomUUID().toString();
-        VerificationToken verificationToken = VerificationToken.builder()
-                .token(token)
-                .user(saveUser)
-                .expiryDate(LocalDateTime.now().plusHours(24))
-                .build();
-        verificationTokenRepository.save(verificationToken);
-        sendVerificationEmail(user.getUserName(), token);
+//        String token = UUID.randomUUID().toString();
+//        VerificationToken verificationToken = VerificationToken.builder()
+//                .token(token)
+//                .user(saveUser)
+//                .expiryDate(LocalDateTime.now().plusHours(24))
+//                .build();
+//        verificationTokenRepository.save(verificationToken);
+//        sendVerificationEmail(user.getUserName(), token);
 
-        return userMapper.mapToUserResponse(saveUser);
+        return UserMapper.mapToUserResponse(saveUser);
     }
 
-    @Async
-    protected void sendVerificationEmail(String recipientEmail, String token) {
-        // Send email to user
-        String subject = "Complete your registration";
-        String verificationUrl = "http://localhost:8081/auth/verifyToken?token=" + token;
-        String message = "To verify your account, please click the link below:\n" + verificationUrl;
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper;
-        try {
-            helper = new MimeMessageHelper(mimeMessage, true);
-            helper.setSubject(subject);
-            helper.setTo(recipientEmail);
-            helper.setText(message, true);
-            mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-        mailSender.send(mimeMessage);
-    }
+//    @Async
+//    protected void sendVerificationEmail(String recipientEmail, String token) {
+//        // Send email to user
+//        String subject = "Complete your registration";
+//        String verificationUrl = "http://localhost:8081/auth/verifyToken?token=" + token;
+//        String message = "To verify your account, please click the link below:\n" + verificationUrl;
+//        MimeMessage mimeMessage = mailSender.createMimeMessage();
+//        MimeMessageHelper helper;
+//        try {
+//            helper = new MimeMessageHelper(mimeMessage, true);
+//            helper.setSubject(subject);
+//            helper.setTo(recipientEmail);
+//            helper.setText(message, true);
+//            mailSender.send(mimeMessage);
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+//        }
+//        mailSender.send(mimeMessage);
+//    }
 
     //Get user
     @Override

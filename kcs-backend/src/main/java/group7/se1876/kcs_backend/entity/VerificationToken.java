@@ -21,8 +21,9 @@ public class VerificationToken {
 
     String token;
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
+    @JoinColumn(nullable = false, name = "user_Id")
     User user;
 
     LocalDateTime expiryDate;
+
 }

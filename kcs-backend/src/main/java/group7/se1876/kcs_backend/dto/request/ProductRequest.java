@@ -13,4 +13,6 @@ public class ProductRequest {
     private CategoryProduct category;
     private int quantity;
     private int quantityOrdered;
+    private String image;
+    private String description;
 }

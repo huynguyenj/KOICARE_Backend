@@ -42,9 +42,15 @@ public class ProductController {
         return ResponseEntity.ok("Product deleted successfully");
     }
 
+
     @PostMapping("/order/{productID}")
     public ResponseEntity<String> orderProduct(@PathVariable int productID, @RequestParam int quantity) {
         String message = productService.orderProduct(productID, quantity);
         return ResponseEntity.ok(message);
+    }
+    @GetMapping("/search/{id}")
+    public ResponseEntity<ProductResponse> searchProduct(@PathVariable int id) {
+        Optional<ProductResponse> product = productService.searchProduct(id);
+        return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

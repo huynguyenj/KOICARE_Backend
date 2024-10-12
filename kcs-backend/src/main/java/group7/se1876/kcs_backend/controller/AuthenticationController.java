@@ -23,7 +23,7 @@ public class AuthenticationController {
 
     //Login authentication
     @PostMapping("/login")
-    ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request){
+    ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
 
         var result = authenticationService.authenticate(request);
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
@@ -55,7 +55,7 @@ public class AuthenticationController {
     @PostMapping("/logout")
     ApiResponse<String> logoutUser(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
 
-         authenticationService.logout(request);
+        authenticationService.logout(request);
 
         return new ApiResponse<>();
     }

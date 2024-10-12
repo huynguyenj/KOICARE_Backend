@@ -39,7 +39,17 @@ public class Product {
     private LocalDateTime updateAt;
 
     @Column
+    private String image;
+
+    @Column
+    private String description;
+
+    @Column
     private boolean isDeleted;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    User user;
 
     @OneToMany(mappedBy = "product")
     @Transient

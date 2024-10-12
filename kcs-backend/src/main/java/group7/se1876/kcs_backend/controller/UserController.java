@@ -22,11 +22,12 @@ public class UserController {
 
     //Register
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<String>> register(@RequestBody @Valid UserDto userDto){
-            userService.register(userDto);
-            return ResponseEntity.ok(ApiResponse.<String>builder()
-                    .result("VERIFY YOUR EMAIL")
-                    .build());
+    public ApiResponse<UserResponse> register(@RequestBody @Valid UserDto userDto){
+
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(userService.register(userDto));
+
+        return apiResponse;
     }
 
     //Get users

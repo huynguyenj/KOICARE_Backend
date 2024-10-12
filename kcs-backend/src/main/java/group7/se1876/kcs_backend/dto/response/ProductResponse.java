@@ -18,5 +18,6 @@ public class ProductResponse {
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private boolean isDeleted;
-    private String message;
+    private String image;
+    private String description;
 }
