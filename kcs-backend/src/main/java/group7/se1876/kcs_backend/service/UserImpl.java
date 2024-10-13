@@ -10,6 +10,7 @@ import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.UserMapper;
 import group7.se1876.kcs_backend.repository.RoleRepository;
+import group7.se1876.kcs_backend.repository.TrackingUserRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -119,6 +120,7 @@ public class UserImpl implements  UserService{
         return userMapper.mapToUserResponse(userRepository.save(user));
     }
 
+    //Delete user
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteUser(Long userId) {

@@ -37,4 +37,6 @@ public class Fish {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User owner;
+    @OneToMany(mappedBy = "fish", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FishDevelopmentHistory> fishDevelopmentHistories;
 }

@@ -2,6 +2,7 @@ package group7.se1876.kcs_backend.controller;
 
 import group7.se1876.kcs_backend.dto.request.UserDto;
 import group7.se1876.kcs_backend.dto.request.UserUpdateRequest;
+import group7.se1876.kcs_backend.dto.response.TrackingUserResponse;
 import group7.se1876.kcs_backend.dto.response.UserResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.UserService;
@@ -83,7 +84,7 @@ public class UserController {
     }
 
     @PutMapping("/setStatus/{userId}")
-    public ApiResponse<UserResponse> setActiceAccount(@PathVariable("userId") Long userId, @RequestParam String decision){
+    public ApiResponse<UserResponse> setActiveAccount(@PathVariable("userId") Long userId, @RequestParam String decision){
 
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.setStatusAccount(userId,decision));
@@ -99,4 +100,5 @@ public class UserController {
 
         return apiResponse;
     }
+
 }

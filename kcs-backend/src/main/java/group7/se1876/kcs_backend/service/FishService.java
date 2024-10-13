@@ -1,13 +1,17 @@
 package group7.se1876.kcs_backend.service;
 
+import group7.se1876.kcs_backend.dto.request.AddFishDevelopmentHistoryRequest;
 import group7.se1876.kcs_backend.dto.request.AddFishRequest;
 import group7.se1876.kcs_backend.dto.request.FishUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.FishResponse;
+import group7.se1876.kcs_backend.dto.response.KoiFishDevelopmentResponse;
 import group7.se1876.kcs_backend.entity.Fish;
+import group7.se1876.kcs_backend.entity.FishDevelopmentHistory;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.FishMapper;
+import group7.se1876.kcs_backend.repository.FishHistories;
 import group7.se1876.kcs_backend.repository.FishRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -15,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +32,8 @@ public class FishService {
     private FishRepository fishRepository;
     private FishMapper fishMapper;
     private UserRepository userRepository;
+    private FishHistories fishHistories;
+
 
     //Add fish
     public FishResponse addFish(AddFishRequest request){
@@ -106,6 +113,28 @@ public class FishService {
             throw new AppException(ErrorCode.DELETE_FAIL);
         }
         fishRepository.delete(fish);
+
+    }
+
+    //Add fish history
+    public KoiFishDevelopmentResponse addFishHistory(Long fishId, AddFishDevelopmentHistoryRequest request){
+
+        Fish fish = fishRepository.findById(fishId)
+                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        if (!fish.getOwner().getUserId().equals(userId)){
+            throw new AppException(ErrorCode.INVALID_USERID);
+        }
+
+        FishDevelopmentHistory fishDevelopmentHistory = fishMapper.mapToFishHistory(request) ;
+        fishDevelopmentHistory.setFish(fish);
+
+        fish.getFishDevelopmentHistories().add(fishDevelopmentHistory);
+        fishRepository.save(fish);
+
+        return fishMapper.mapToKoiFishResponse(fishDevelopmentHistory);
 
     }
 }

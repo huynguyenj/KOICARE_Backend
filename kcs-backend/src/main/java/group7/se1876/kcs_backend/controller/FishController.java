@@ -1,8 +1,10 @@
 package group7.se1876.kcs_backend.controller;
 
+import group7.se1876.kcs_backend.dto.request.AddFishDevelopmentHistoryRequest;
 import group7.se1876.kcs_backend.dto.request.AddFishRequest;
 import group7.se1876.kcs_backend.dto.request.FishUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.FishResponse;
+import group7.se1876.kcs_backend.dto.response.KoiFishDevelopmentResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.FishService;
 import lombok.AllArgsConstructor;
@@ -68,4 +70,14 @@ public class FishController {
         return apiResponse;
     }
 
+    //Add fish development history
+    @PostMapping("/{fishId}/addFishDevelopment")
+    public ApiResponse<KoiFishDevelopmentResponse> addDevelopmentHistory(@PathVariable("fishId")Long fishId,
+                                                                         @RequestBody AddFishDevelopmentHistoryRequest request){
+
+        ApiResponse<KoiFishDevelopmentResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(fishService.addFishHistory(fishId,request));
+
+        return apiResponse;
+    }
 }
