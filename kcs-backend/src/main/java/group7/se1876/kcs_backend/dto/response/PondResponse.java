@@ -22,7 +22,6 @@ public class PondResponse {
         private double volume;
         private int drainCount;
         private double pumpCapacity;
-        private double saltAmount;
         private Date date;
         private List<FishResponseWithPond> fishResponses;
         private Long userId;

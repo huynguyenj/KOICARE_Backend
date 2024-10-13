@@ -16,8 +16,5 @@ import java.util.List;
 public class PondWithFishResponse {
     private Long pondId;
     private String pondName;
-    private Date date;
-    private List<FishResponseWithPond> fishResponses;
-
 
 }

@@ -67,8 +67,11 @@ public class PondService {
     //Get pond info
     public PondResponse getPondInfo(Long pondId){
 
+            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
             Pond pond = pondRepository.findById(pondId)
                     .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+            if(userId != pond.getUser().getUserId())
+                throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
 
             return pondMapper.mapToPondResponse(pond);
     }
@@ -94,10 +97,16 @@ public class PondService {
 
     }
 
+    //Update pond
     public PondResponse updatePond(Long pondId, PondUpdateRequest request){
 
+            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
             Pond pond = pondRepository.findById(pondId)
                     .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+            if (userId != pond.getUser().getUserId())
+                throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+
 
             pond.setPondName(request.getPondName());
             pond.setPondImg(request.getPondImg());
@@ -105,7 +114,6 @@ public class PondService {
             pond.setDepth(request.getDepth());
             pond.setDrainCount(request.getDrainCount());
             pond.setPumpCapacity(request.getPumpCapacity());
-            pond.setSaltAmount(request.getSaltAmount());
             pond.setSize(request.getSize());
             pond.setVolume(request.getVolume());
 
@@ -115,6 +123,7 @@ public class PondService {
 
     }
 
+    //Add fish to pond
     public PondResponse addFishToPond(Long pondId,Long fishId){
 
             Fish fish = fishRepository.findById(fishId)
@@ -126,7 +135,7 @@ public class PondService {
             Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
             if(fish.getOwner().getUserId() != userId || pond.getUser().getUserId() != userId){
-              throw  new AppException(ErrorCode.DATA_NOT_EXISTED);
+              throw  new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
             }
 
             pond.getFish().add(fish);

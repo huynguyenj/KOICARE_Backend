@@ -26,4 +26,5 @@ public class FishResponse {
     private String origin;
     private double price;
     private List<KoiFishDevelopmentResponse> fishDevelopmentHistories;
+    private List<PondWithFishResponse> pond;
 }

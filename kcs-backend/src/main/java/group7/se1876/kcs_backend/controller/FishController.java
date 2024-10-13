@@ -80,4 +80,17 @@ public class FishController {
 
         return apiResponse;
     }
+
+    //Get fish development history
+    @GetMapping("/{fishid}/getFishDevelopment")
+    public ApiResponse<List<KoiFishDevelopmentResponse>> getFishHistories(@PathVariable("fishid")Long fishId){
+
+        ApiResponse<List<KoiFishDevelopmentResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(fishService.getFishHistories(fishId));
+
+        return apiResponse;
+
+    }
+
+
 }

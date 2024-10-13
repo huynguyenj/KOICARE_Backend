@@ -4,6 +4,8 @@ import group7.se1876.kcs_backend.dto.request.AddFishDevelopmentHistoryRequest;
 import group7.se1876.kcs_backend.dto.request.AddFishRequest;
 import group7.se1876.kcs_backend.dto.response.FishResponse;
 import group7.se1876.kcs_backend.dto.response.KoiFishDevelopmentResponse;
+import group7.se1876.kcs_backend.dto.response.PondResponse;
+import group7.se1876.kcs_backend.dto.response.PondWithFishResponse;
 import group7.se1876.kcs_backend.entity.Fish;
 import group7.se1876.kcs_backend.entity.FishDevelopmentHistory;
 import org.springframework.stereotype.Component;
@@ -36,6 +38,7 @@ public class FishMapper {
     }
 
     public static FishResponse mapToFishResponse(Fish fish) {
+
         List<KoiFishDevelopmentResponse> fishHistories = (fish.getFishDevelopmentHistories()!=null)
         ?fish.getFishDevelopmentHistories().stream()
                 .map(fishDevelopmentHistory-> new KoiFishDevelopmentResponse(
@@ -45,6 +48,13 @@ public class FishMapper {
                         fishDevelopmentHistory.getAge(),
                         fishDevelopmentHistory.getWeight(),
                         fish.getFishName())).collect(Collectors.toList()): new ArrayList<>();
+
+        List<PondWithFishResponse> pondResponses = (fish.getPonds() != null)
+
+                ? fish.getPonds().stream()
+                .map(pond -> new PondWithFishResponse(pond.getPondId(),pond.getPondName()))
+                .collect(Collectors.toList())
+                : new ArrayList<>();
 
                 return new FishResponse(
                 fish.getFishId(),
@@ -59,7 +69,9 @@ public class FishMapper {
                 fish.getFishType(),
                 fish.getOrigin(),
                 fish.getPrice(),
-                        fishHistories
+                        fishHistories,
+                        pondResponses
+
         );
 
     }
