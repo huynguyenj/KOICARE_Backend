@@ -8,20 +8,22 @@ import lombok.Setter;
 
 import java.util.Date;
 
-//@Entity
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@Getter
-//@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Blog {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long blogId;
-//    private String title;
-//    private String content;
-//    private Date publishedDate;
-//
-//    @ManyToOne
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long blogId;
+    private String title;
+    private String content;
+    private Date publishedDate;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    private User user;
 
 }
