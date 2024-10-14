@@ -1,6 +1,8 @@
 package group7.se1876.kcs_backend.exception;
 
+import group7.se1876.kcs_backend.dto.response.ErrorResponse;
 import jakarta.transaction.SystemException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -97,14 +99,9 @@ public class GlobalExceptionHandle {
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
-    @ExceptionHandler(value = ProductAlreadyExistsException.class)
-    ResponseEntity<ApiResponse> handleProductAlreadyExistsException(ProductAlreadyExistsException exception){
-        ErrorCode errorCode = ErrorCode.ITEM_EXISTED;
-
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-
-        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleProductAlreadyExistsException(ProductAlreadyExistsException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 }

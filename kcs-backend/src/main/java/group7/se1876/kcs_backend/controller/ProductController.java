@@ -1,16 +1,19 @@
 package group7.se1876.kcs_backend.controller;
 
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
+import group7.se1876.kcs_backend.dto.response.ErrorResponse;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
 import group7.se1876.kcs_backend.exception.ProductAlreadyExistsException;
 import group7.se1876.kcs_backend.service.ProductService;
-import jakarta.transaction.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/product")
@@ -19,9 +22,24 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("/create")
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) throws ProductAlreadyExistsException {
-        ProductResponse product = productService.createProduct(productRequest);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<?> createProduct(@RequestBody ProductRequest productRequest) {
+        try {
+            ProductResponse productResponse = productService.createProduct(productRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
+        } catch (ProductAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/uploadImage")
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+        String imageUrl = saveFile(file);
+        return ResponseEntity.ok(imageUrl);
+    }
+    private String saveFile(MultipartFile file) {
+        String uploadDir = "path_to_save_images/";
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        return "http://localhost:8080/images/" + file.getOriginalFilename();
     }
 
     @GetMapping("/all")
@@ -48,6 +66,7 @@ public class ProductController {
         String message = productService.orderProduct(productID, quantity);
         return ResponseEntity.ok(message);
     }
+
     @GetMapping("/search/{id}")
     public ResponseEntity<ProductResponse> searchProduct(@PathVariable int id) {
         Optional<ProductResponse> product = productService.searchProduct(id);

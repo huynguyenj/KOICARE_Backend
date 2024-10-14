@@ -4,13 +4,10 @@ import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
 import group7.se1876.kcs_backend.entity.OrderDetail;
 import group7.se1876.kcs_backend.entity.Product;
-import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.*;
 import group7.se1876.kcs_backend.repository.OrderDetailRepository;
 import group7.se1876.kcs_backend.repository.ProductRepository;
-import group7.se1876.kcs_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,45 +23,41 @@ public class ProductService {
 
     @Autowired
     private OrderDetailRepository orderDetailRepository;
-    @Autowired
-    private UserRepository userRepository;
 
 
     public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        Optional<Product> productOptional = productRepository.findByProductName(productRequest.getProductName());
-        if (productOptional.isPresent()) {
-            throw new ProductAlreadyExistsException("Product with name " + productRequest.getProductName() + " already exists.");
+
+        if (productRepository.existsByProductName(productRequest.getProductName())) {
+            throw new ProductAlreadyExistsException("Product with name already exists.");
         }
-        final Product product = Product.builder()
+        Product product = Product.builder()
                 .productName(productRequest.getProductName())
                 .price(productRequest.getPrice())
                 .category(productRequest.getCategory())
                 .quantity(productRequest.getQuantity())
+                .image(productRequest.getImage())
+                .description(productRequest.getDescription())
                 .createAt(LocalDateTime.now())
                 .updateAt(LocalDateTime.now())
-                .user(user)
+                .isDeleted(false)
                 .build();
-
         Product savedProduct = productRepository.save(product);
         return convertToResponse(savedProduct);
     }
 
     public Optional<ProductResponse> updateProduct(int id, ProductRequest productRequest) {
         Optional<Product> productOptional = productRepository.findById(id);
-        if (productOptional.isPresent()) {
-            Product product = productOptional.get();
-            product.setProductName(productRequest.getProductName());
-            product.setPrice(productRequest.getPrice());
-            product.setCategory(productRequest.getCategory());
-            product.setQuantity(productRequest.getQuantity());
-            product.setUpdateAt(LocalDateTime.now());
-            Product updatedProduct = productRepository.save(product);
-            return Optional.of(convertToResponse(updatedProduct));
+        if (productOptional.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        Product product = productOptional.get();
+        product.setProductName(productRequest.getProductName());
+        product.setPrice(productRequest.getPrice());
+        product.setCategory(productRequest.getCategory());
+        product.setQuantity(productRequest.getQuantity());
+        product.setUpdateAt(LocalDateTime.now());
+        Product updatedProduct = productRepository.save(product);
+        return Optional.of(convertToResponse(updatedProduct));
     }
 
     public List<ProductResponse> getAllProducts() {
@@ -122,6 +115,8 @@ public class ProductService {
         productResponse.setCreateAt(product.getCreateAt());
         productResponse.setUpdateAt(product.getUpdateAt());
         productResponse.setDeleted(product.isDeleted());
+        productResponse.setImage(product.getImage());
+        productResponse.setDescription(product.getDescription());
         return productResponse;
 
     }

@@ -22,7 +22,7 @@ public class Order {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(nullable = false)
@@ -37,6 +37,7 @@ public class Order {
 
     @Column
     private boolean isDeleted;
+
 
     @OneToMany(mappedBy = "order")
     @Transient

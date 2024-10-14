@@ -22,7 +22,7 @@ public class Product {
     @Column(name = "product_name")
     private String productName;
 
-    @Column
+    @Column(nullable = false)
     private double price;
 
     @Column
@@ -38,18 +38,14 @@ public class Product {
     @Column
     private LocalDateTime updateAt;
 
-    @Column
+    @Column(name = "image")
     private String image;
 
-    @Column
+    @Column(nullable = false)
     private String description;
 
     @Column
     private boolean isDeleted;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    User user;
 
     @OneToMany(mappedBy = "product")
     @Transient
