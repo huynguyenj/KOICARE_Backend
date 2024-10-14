@@ -10,6 +10,7 @@ import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.UserMapper;
 import group7.se1876.kcs_backend.repository.RoleRepository;
+import group7.se1876.kcs_backend.repository.TrackingUserRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -118,6 +120,7 @@ public class UserImpl implements  UserService{
         return userMapper.mapToUserResponse(userRepository.save(user));
     }
 
+    //Delete user
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteUser(Long userId) {
@@ -143,5 +146,45 @@ public class UserImpl implements  UserService{
         }
 
     return userMapper.mapToUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse setRole(Long userId, String role) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new AppException((ErrorCode.INVALID_USERID)));
+
+        RoleDetail roleDetail;
+
+        switch (role.toLowerCase()) {
+            case "admin":
+                roleDetail = new RoleDetail();
+                roleDetail.setRoleType(Role.ADMIN.name());
+                user.getRoles().add(roleDetail);
+                break;
+
+            case "shop":
+                roleDetail = roleRepository.findByRoleType(Role.SHOP.name())
+                        .orElseGet(() -> {
+                            RoleDetail newRole = new RoleDetail();
+                            newRole.setRoleType(Role.SHOP.name());
+                            return roleRepository.save(newRole);
+                        });
+                user.getRoles().add(roleDetail);
+                break;
+
+            case "unshop":
+                // Logic for removing the 'shop' role
+               Set<RoleDetail> roles = user.getRoles();
+               roles.removeIf(rol->rol.getRoleType().equalsIgnoreCase("shop"));
+                break;
+
+            default:
+                throw new IllegalArgumentException("Invalid role type: " + role);
+        }
+
+        userRepository.save(user);
+
+        return userMapper.mapToUserResponse(user);
     }
 }

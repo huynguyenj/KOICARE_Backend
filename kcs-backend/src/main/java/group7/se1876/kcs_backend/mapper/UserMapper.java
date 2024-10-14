@@ -32,6 +32,7 @@ public class UserMapper {
                 userDto.getEmail(),
                 userDto.isStatus(),
                 null,
+                null,
                 null
         );
     }

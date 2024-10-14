@@ -3,11 +3,13 @@ package group7.se1876.kcs_backend.service;
 import group7.se1876.kcs_backend.dto.request.AddPondRequest;
 import group7.se1876.kcs_backend.dto.request.PondUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.PondResponse;
+import group7.se1876.kcs_backend.entity.Fish;
 import group7.se1876.kcs_backend.entity.Pond;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.PondMapper;
+import group7.se1876.kcs_backend.repository.FishRepository;
 import group7.se1876.kcs_backend.repository.PondRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class PondService {
         private PondRepository pondRepository;
         private UserRepository userRepository;
+        private FishRepository fishRepository;
         private PondMapper pondMapper;
 
         //Add pond
@@ -60,6 +63,19 @@ public class PondService {
 
         return ponds.stream().map((pond)-> pondMapper.mapToPondResponse(pond)).collect(Collectors.toList());
     }
+
+    //Get pond info
+    public PondResponse getPondInfo(Long pondId){
+
+            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+            Pond pond = pondRepository.findById(pondId)
+                    .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+            if(userId != pond.getUser().getUserId())
+                throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+
+            return pondMapper.mapToPondResponse(pond);
+    }
+
         //Delete pond
     public void deletePond(Long pondId){
 
@@ -81,10 +97,16 @@ public class PondService {
 
     }
 
+    //Update pond
     public PondResponse updatePond(Long pondId, PondUpdateRequest request){
 
+            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
             Pond pond = pondRepository.findById(pondId)
                     .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+            if (userId != pond.getUser().getUserId())
+                throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+
 
             pond.setPondName(request.getPondName());
             pond.setPondImg(request.getPondImg());
@@ -92,7 +114,6 @@ public class PondService {
             pond.setDepth(request.getDepth());
             pond.setDrainCount(request.getDrainCount());
             pond.setPumpCapacity(request.getPumpCapacity());
-            pond.setSaltAmount(request.getSaltAmount());
             pond.setSize(request.getSize());
             pond.setVolume(request.getVolume());
 
@@ -100,5 +121,29 @@ public class PondService {
 
             return pondMapper.mapToPondResponse(pond);
 
+    }
+
+    //Add fish to pond
+    public PondResponse addFishToPond(Long pondId,Long fishId){
+
+            Fish fish = fishRepository.findById(fishId)
+                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+            Pond pond = pondRepository.findById(pondId)
+                    .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+            if(fish.getOwner().getUserId() != userId || pond.getUser().getUserId() != userId){
+              throw  new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+            }
+
+            pond.getFish().add(fish);
+            pondRepository.save(pond);
+
+            fish.getPonds().add(pond);
+            fishRepository.save(fish);
+
+            return pondMapper.mapToPondResponse(pond);
     }
 }

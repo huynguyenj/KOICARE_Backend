@@ -9,12 +9,15 @@ import group7.se1876.kcs_backend.dto.request.AuthenticationRequest;
 import group7.se1876.kcs_backend.dto.request.LogoutRequest;
 import group7.se1876.kcs_backend.dto.request.VerifyTokenRequest;
 import group7.se1876.kcs_backend.dto.response.AuthenticationResponse;
+import group7.se1876.kcs_backend.dto.response.TrackingUserResponse;
 import group7.se1876.kcs_backend.dto.response.VerifyTokenResponse;
 import group7.se1876.kcs_backend.entity.InvalidatedToken;
+import group7.se1876.kcs_backend.entity.TrackingUserLogin;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.repository.InvalidatedTokenRepository;
+import group7.se1876.kcs_backend.repository.TrackingUserRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
@@ -24,13 +27,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
+import org.springframework.security.core.context.SecurityContextHolder;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -40,6 +41,7 @@ public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final InvalidatedTokenRepository invalidatedTokenRepository;
+    private final TrackingUserRepository trackingUserRepository;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -69,6 +71,8 @@ public class AuthenticationService {
 
         authRes.setToken(token);
         authRes.setAuthenticated(true);
+
+        trackingLogin(user.getUserId());
 
         return authRes;
 
@@ -145,6 +149,21 @@ public class AuthenticationService {
     //Logout
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
 
+    try {
+
+        String token = request.getToken(); // Assuming token is available here
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        String userId = signedJWT.getJWTClaimsSet().getSubject();
+
+        if (userId!=null){
+            Long userIdBefore = Long.valueOf(userId);
+            System.out.println(userId);
+            trackingUserRepository.deleteByUserId(userIdBefore);
+        }
+        }catch (Exception e){
+    throw new AppException(ErrorCode.INVALID_INFOMATION);
+    }
+
         var signToken = tokenCheck(request.getToken());
 
         String jit = signToken.getJWTClaimsSet().getJWTID();
@@ -153,6 +172,7 @@ public class AuthenticationService {
         InvalidatedToken invalidToken = new InvalidatedToken();
         invalidToken.setTokenId(jit);
         invalidToken.setTimeExpired(expiredTime);
+
 
         invalidatedTokenRepository.save(invalidToken);
 
@@ -177,5 +197,33 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHORIZED);
 
         return signedJWT;
+    }
+
+    //Tracking login
+    private void trackingLogin(Long userId){
+
+        TrackingUserLogin trackingUserLogin = new TrackingUserLogin();
+        trackingUserLogin.setUserId(userId);
+
+        trackingUserRepository.save(trackingUserLogin);
+    }
+
+    //Count login user at present
+    public TrackingUserResponse countLoginUser(){
+
+        Set<Long> uniqueUserIds = new HashSet<>();
+        List<TrackingUserLogin> userLogins = trackingUserRepository.findAll();
+
+
+        for (TrackingUserLogin user : userLogins){
+            uniqueUserIds.add(user.getUserId());
+        }
+
+        Long count = (long)uniqueUserIds.size();
+
+        TrackingUserResponse trackingUserResponse = new TrackingUserResponse();
+        trackingUserResponse.setUserCount(count);
+
+         return trackingUserResponse;
     }
 }

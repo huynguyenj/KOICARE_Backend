@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,6 +22,7 @@ public class PondResponse {
         private double volume;
         private int drainCount;
         private double pumpCapacity;
-        private double saltAmount;
         private Date date;
+        private List<FishResponseWithPond> fishResponses;
+        private Long userId;
 }
