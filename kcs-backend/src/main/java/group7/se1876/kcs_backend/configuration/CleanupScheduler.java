@@ -12,8 +12,9 @@ public class CleanupScheduler {
     private InvalidTokenService invalidTokenService;
 
     //Clean up logout token
-    @Scheduled(cron = "0 0 0 * * *") //Run at 00:00 every day
+    @Scheduled(cron = "0 */1 * * * *") //Run at every 1 minutes
     public void cleanTokenData(){
+        System.out.println("Scheduled task is running...");
         invalidTokenService.deleteExpiredTime();
     }
 }

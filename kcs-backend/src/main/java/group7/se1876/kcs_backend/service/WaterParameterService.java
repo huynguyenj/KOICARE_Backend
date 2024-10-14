@@ -172,7 +172,7 @@ public class WaterParameterService {
 
     //Salt calculation
     public Double saltCalculation(Long pondId, String saltPercent){
-        
+
         Pond pond = pondRepository.findById(pondId)
                 .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -196,6 +196,7 @@ public class WaterParameterService {
                 result =  volume*0.007;
                 break;
             default:
+                result = 0;
         }
         return result;
     }
