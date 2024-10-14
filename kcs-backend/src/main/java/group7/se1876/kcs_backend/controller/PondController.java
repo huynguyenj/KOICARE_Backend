@@ -135,4 +135,17 @@ public class PondController {
         return apiResponse;
     }
 
+    //Salt calculation
+    @GetMapping("/water_parameter/saltCalculate/{pondId}")
+    public ApiResponse<Double> updateSaltAfterCalculateParameter(
+            @PathVariable("pondId")Long pondId,
+            @RequestParam String saltPercent){
+
+        ApiResponse<Double> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(waterParameterService.saltCalculation(pondId,saltPercent));
+
+        return apiResponse;
+    }
+
+
 }

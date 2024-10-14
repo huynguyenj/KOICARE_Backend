@@ -169,6 +169,36 @@ public class WaterParameterService {
         return pondMapper.mapToWaterParameterResponse(waterParameter);
 
     }
+
+    //Salt calculation
+    public Double saltCalculation(Long pondId, String saltPercent){
+        
+        Pond pond = pondRepository.findById(pondId)
+                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        if (userId != pond.getUser().getUserId()){
+            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+        }
+
+        double volume = pond.getVolume();
+        System.out.println(volume);
+        double result = 0;
+
+        switch (saltPercent){
+            case "0.3":
+               result =  volume*0.003;
+                break;
+            case "0.5":
+                result =  volume*0.005;
+                break;
+            case "0.7":
+                result =  volume*0.007;
+                break;
+            default:
+        }
+        return result;
+    }
 }
 
 

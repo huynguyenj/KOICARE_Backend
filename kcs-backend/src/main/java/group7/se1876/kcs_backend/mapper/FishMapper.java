@@ -33,6 +33,7 @@ public class FishMapper {
                 request.getPrice(),
                 null,
                 null,
+                null,
                 null
         );
     }
