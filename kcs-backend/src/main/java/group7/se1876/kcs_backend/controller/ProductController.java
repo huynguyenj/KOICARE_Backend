@@ -3,7 +3,9 @@ package group7.se1876.kcs_backend.controller;
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.ErrorResponse;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
+import group7.se1876.kcs_backend.enums.CategoryProduct;
 import group7.se1876.kcs_backend.exception.ProductAlreadyExistsException;
+import group7.se1876.kcs_backend.service.CloudinaryService;
 import group7.se1876.kcs_backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,21 +23,44 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest productRequest) {
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+    @PostMapping(consumes = { "multipart/form-data" })
+    public ResponseEntity<ProductResponse> createProduct(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("productName") String productName,
+            @RequestParam("price") double price,
+            @RequestParam("category") String category,
+            @RequestParam("quantity") int quantity,
+            @RequestParam("description") String description) {
         try {
+            System.out.println("Product Name: " + productName);
+            System.out.println("Price: " + price);
+            System.out.println("Category: " + category);
+            System.out.println("Quantity: " + quantity);
+            System.out.println("Description: " + description);
+
+            String imageUrl = cloudinaryService.uploadFile(file);
+            ProductRequest productRequest = new ProductRequest();
+            productRequest.setProductName(productName);
+            productRequest.setPrice(price);
+            productRequest.setCategory(CategoryProduct.valueOf(category));
+            productRequest.setQuantity(quantity);
+            productRequest.setDescription(description);
+            productRequest.setImage(imageUrl);
             ProductResponse productResponse = productService.createProduct(productRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
         } catch (ProductAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
+            // Handle specific case when product already exists
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ProductResponse("Product already exists"));
+        } catch (Exception e) {
+            // Catch any other exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ProductResponse("Failed to create product"));
         }
     }
 
-    @PostMapping("/uploadImage")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
-        String imageUrl = saveFile(file);
-        return ResponseEntity.ok(imageUrl);
-    }
+
     private String saveFile(MultipartFile file) {
         String uploadDir = "path_to_save_images/";
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();

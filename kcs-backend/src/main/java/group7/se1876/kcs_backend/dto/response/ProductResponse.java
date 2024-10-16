@@ -1,13 +1,17 @@
 package group7.se1876.kcs_backend.dto.response;
 
 import group7.se1876.kcs_backend.enums.CategoryProduct;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductResponse {
 
     private int id;
@@ -20,4 +24,8 @@ public class ProductResponse {
     private boolean isDeleted;
     private String image;
     private String description;
+
+
+    public ProductResponse(String productAlreadyExists) {
+    }
 }

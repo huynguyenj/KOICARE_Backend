@@ -8,6 +8,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 
@@ -100,8 +101,8 @@ public class GlobalExceptionHandle {
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
     @ExceptionHandler(ProductAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleProductAlreadyExistsException(ProductAlreadyExistsException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex, WebRequest request) {
+        return new ResponseEntity<>(new ErrorResponse("A runtime error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }
