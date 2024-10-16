@@ -13,6 +13,7 @@ import java.util.Date;
 @Setter
 public class AddBlogRequest {
     private Long blogId;
+    private String image;
     private String title;
     private String content;
     private Date publishedDate;

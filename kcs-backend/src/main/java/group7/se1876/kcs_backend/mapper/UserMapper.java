@@ -63,6 +63,7 @@ public class UserMapper {
     public static Blog mapToBlog(AddBlogRequest request){
         return new Blog(
                 request.getBlogId(),
+                request.getImage(),
                 request.getTitle(),
                 request.getContent(),
                 request.getPublishedDate(),
@@ -73,6 +74,7 @@ public class UserMapper {
     public static BlogResponse mapToBlogResponse(Blog blog){
         return new BlogResponse(
                 blog.getBlogId(),
+                blog.getImage(),
                 blog.getTitle(),
                 blog.getContent(),
                 blog.getPublishedDate(),

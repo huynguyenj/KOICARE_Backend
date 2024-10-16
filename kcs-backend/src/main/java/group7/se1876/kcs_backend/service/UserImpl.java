@@ -169,12 +169,6 @@ public class UserImpl implements  UserService{
         RoleDetail roleDetail;
 
         switch (role.toLowerCase()) {
-            case "admin":
-                roleDetail = new RoleDetail();
-                roleDetail.setRoleType(Role.ADMIN.name());
-                user.getRoles().add(roleDetail);
-                break;
-
             case "shop":
                 roleDetail = roleRepository.findByRoleType(Role.SHOP.name())
                         .orElseGet(() -> {

@@ -18,6 +18,7 @@ public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long blogId;
+    private String image;
     private String title;
     private String content;
     private Date publishedDate;

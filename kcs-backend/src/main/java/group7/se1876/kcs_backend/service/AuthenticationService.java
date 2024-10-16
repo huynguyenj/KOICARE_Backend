@@ -19,10 +19,12 @@ import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.repository.InvalidatedTokenRepository;
 import group7.se1876.kcs_backend.repository.TrackingUserRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -226,4 +228,6 @@ public class AuthenticationService {
 
          return trackingUserResponse;
     }
+
+
 }
