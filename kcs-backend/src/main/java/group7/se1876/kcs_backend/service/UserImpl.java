@@ -37,7 +37,7 @@ public class UserImpl implements  UserService{
 
     //Register
     @Override
-    public UserResponse register(UserDto userRequest) {
+    public UserResponse register(UserDto userRequest, String userRoleChoice) {
 
         // Map data object to entity
         if(userRepository.existsByUserName(userRequest.getUserName()) || userRepository.existsByEmail(userRequest.getEmail())){
@@ -49,19 +49,31 @@ public class UserImpl implements  UserService{
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
-        //Set new role for user is USER ROLE
-        RoleDetail userRole = roleRepository.findByRoleType(Role.USER.name())
-                .orElseGet(()->{
-                    RoleDetail newRole = new RoleDetail();
-                    newRole.setRoleType(Role.USER.name());
-                    return roleRepository.save(newRole);
-                });
-
         HashSet<RoleDetail> roles = new HashSet<>();
-        roles.add(userRole);
-        user.setRoles(roles);
+        //Set shop role if user choose role shop when register
+        if (userRoleChoice.equalsIgnoreCase("shop")){
+            RoleDetail userRole = roleRepository.findByRoleType(Role.SHOP.name())
+                    .orElseGet(()->{
+                        RoleDetail newRole = new RoleDetail();
+                        newRole.setRoleType(Role.SHOP.name());
+                        return roleRepository.save(newRole);
+                    });
 
-        // Save data already map to entity to database
+            roles.add(userRole);
+            user.setRoles(roles);
+        }else {
+            //Set new role for user is USER ROLE
+            RoleDetail userRole = roleRepository.findByRoleType(Role.USER.name())
+                    .orElseGet(()->{
+                        RoleDetail newRole = new RoleDetail();
+                        newRole.setRoleType(Role.USER.name());
+                        return roleRepository.save(newRole);
+                    });
+
+            roles.add(userRole);
+            user.setRoles(roles);
+        }
+
         User saveUser = userRepository.save(user);
 
         return userMapper.mapToUserResponse(saveUser);
@@ -157,12 +169,6 @@ public class UserImpl implements  UserService{
         RoleDetail roleDetail;
 
         switch (role.toLowerCase()) {
-            case "admin":
-                roleDetail = new RoleDetail();
-                roleDetail.setRoleType(Role.ADMIN.name());
-                user.getRoles().add(roleDetail);
-                break;
-
             case "shop":
                 roleDetail = roleRepository.findByRoleType(Role.SHOP.name())
                         .orElseGet(() -> {

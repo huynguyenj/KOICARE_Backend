@@ -5,14 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class AddFishDevelopmentHistoryRequest {
-    private Long historyId;
-    private double size;
-    private int age;
-    private double weight;
+public class BlogUpdateRequest {
+    private String title;
+    private String content;
+    private Date publishedDate;
 }

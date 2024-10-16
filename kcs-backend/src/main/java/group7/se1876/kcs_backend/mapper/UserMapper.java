@@ -1,8 +1,11 @@
 package group7.se1876.kcs_backend.mapper;
 
+import group7.se1876.kcs_backend.dto.request.AddBlogRequest;
 import group7.se1876.kcs_backend.dto.request.UserDto;
+import group7.se1876.kcs_backend.dto.response.BlogResponse;
 import group7.se1876.kcs_backend.dto.response.RoleRespone;
 import group7.se1876.kcs_backend.dto.response.UserResponse;
+import group7.se1876.kcs_backend.entity.Blog;
 import group7.se1876.kcs_backend.entity.RoleDetail;
 import group7.se1876.kcs_backend.entity.User;
 import org.springframework.stereotype.Component;
@@ -33,6 +36,7 @@ public class UserMapper {
                 userDto.isStatus(),
                 null,
                 null,
+                null,
                 null
         );
     }
@@ -56,4 +60,26 @@ public class UserMapper {
         );
     }
 
+    public static Blog mapToBlog(AddBlogRequest request){
+        return new Blog(
+                request.getBlogId(),
+                request.getImage(),
+                request.getTitle(),
+                request.getContent(),
+                request.getPublishedDate(),
+                null
+        );
+    }
+
+    public static BlogResponse mapToBlogResponse(Blog blog){
+        return new BlogResponse(
+                blog.getBlogId(),
+                blog.getImage(),
+                blog.getTitle(),
+                blog.getContent(),
+                blog.getPublishedDate(),
+                blog.getUser().getUserName()
+
+        );
+    }
 }

@@ -4,6 +4,7 @@ import group7.se1876.kcs_backend.dto.request.AddFishDevelopmentHistoryRequest;
 import group7.se1876.kcs_backend.dto.request.AddFishRequest;
 import group7.se1876.kcs_backend.dto.request.FishUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.FishResponse;
+import group7.se1876.kcs_backend.dto.response.FoodCalculationResponse;
 import group7.se1876.kcs_backend.dto.response.KoiFishDevelopmentResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.FishService;
@@ -90,6 +91,26 @@ public class FishController {
 
         return apiResponse;
 
+    }
+
+    //Create Food calculation
+    @PostMapping("{fishId}/foodCalculation")
+    public ApiResponse<FoodCalculationResponse> addFoodCalcultion(@PathVariable("fishId")Long fishId){
+
+        ApiResponse<FoodCalculationResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(fishService.addFoodCalculation(fishId));
+
+        return apiResponse;
+    }
+
+    //Get all food calculation of fish
+    @GetMapping("{fishId}/getFoodCalculations")
+    public ApiResponse<List<FoodCalculationResponse>> getAllFoodCalculations(@PathVariable("fishId") Long fishId){
+
+        ApiResponse<List<FoodCalculationResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(fishService.getAllFoodCalculation(fishId));
+
+        return apiResponse;
     }
 
 

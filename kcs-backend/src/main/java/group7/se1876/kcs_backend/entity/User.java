@@ -25,7 +25,7 @@ public class User {
 
     private String password;
 
-    private Long phone;
+    private String phone;
 
     private String email;
 
@@ -42,4 +42,7 @@ public class User {
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Fish> fishOwned;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Blog> blogs;
 }

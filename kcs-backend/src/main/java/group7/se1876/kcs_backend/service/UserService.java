@@ -7,7 +7,7 @@ import group7.se1876.kcs_backend.dto.response.UserResponse;
 import java.util.List;
 
 public interface UserService {
-    UserResponse register(UserDto userDto);
+    UserResponse register(UserDto userDto, String userRoleChoice);
     UserResponse getUser(Long userId);
     UserResponse getMyInfo();
     List<UserResponse >getAllUser();
