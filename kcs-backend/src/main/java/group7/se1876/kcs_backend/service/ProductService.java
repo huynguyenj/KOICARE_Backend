@@ -4,12 +4,9 @@ import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
 import group7.se1876.kcs_backend.entity.OrderDetail;
 import group7.se1876.kcs_backend.entity.Product;
-import group7.se1876.kcs_backend.exception.ErrorCode;
-import group7.se1876.kcs_backend.exception.ItemNotFoundException;
-import group7.se1876.kcs_backend.exception.OutOfStockException;
+import group7.se1876.kcs_backend.exception.*;
 import group7.se1876.kcs_backend.repository.OrderDetailRepository;
 import group7.se1876.kcs_backend.repository.ProductRepository;
-import jakarta.transaction.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,37 +25,39 @@ public class ProductService {
     private OrderDetailRepository orderDetailRepository;
 
 
-    public ProductResponse createProduct(ProductRequest productRequest) throws SystemException {
-        try {
-            Product product = Product.builder()
-                    .productName(productRequest.getProductName())
-                    .price(productRequest.getPrice())
-                    .category(productRequest.getCategory())
-                    .quantity(productRequest.getQuantity())
-                    .createAt(LocalDateTime.now())
-                    .updateAt(LocalDateTime.now())
-                    .isDeleted(false)
-                    .build();
-            Product savedProduct = productRepository.save(product);
-            return convertToResponse(savedProduct);
-        } catch (Exception e) {
-            throw new SystemException(String.valueOf(ErrorCode.ITEM_EXISTED));
+    public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
+
+        if (productRepository.existsByProductName(productRequest.getProductName())) {
+            throw new ProductAlreadyExistsException("Product with name already exists.");
         }
+        Product product = Product.builder()
+                .productName(productRequest.getProductName())
+                .price(productRequest.getPrice())
+                .category(productRequest.getCategory())
+                .quantity(productRequest.getQuantity())
+                .image(productRequest.getImage())
+                .description(productRequest.getDescription())
+                .createAt(LocalDateTime.now())
+                .updateAt(LocalDateTime.now())
+                .isDeleted(false)
+                .build();
+        Product savedProduct = productRepository.save(product);
+        return convertToResponse(savedProduct);
     }
 
     public Optional<ProductResponse> updateProduct(int id, ProductRequest productRequest) {
         Optional<Product> productOptional = productRepository.findById(id);
-        if (productOptional.isPresent()) {
-            Product product = productOptional.get();
-            product.setProductName(productRequest.getProductName());
-            product.setPrice(productRequest.getPrice());
-            product.setCategory(productRequest.getCategory());
-            product.setQuantity(productRequest.getQuantity());
-            product.setUpdateAt(LocalDateTime.now());
-            Product updatedProduct = productRepository.save(product);
-            return Optional.of(convertToResponse(updatedProduct));
+        if (productOptional.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        Product product = productOptional.get();
+        product.setProductName(productRequest.getProductName());
+        product.setPrice(productRequest.getPrice());
+        product.setCategory(productRequest.getCategory());
+        product.setQuantity(productRequest.getQuantity());
+        product.setUpdateAt(LocalDateTime.now());
+        Product updatedProduct = productRepository.save(product);
+        return Optional.of(convertToResponse(updatedProduct));
     }
 
     public List<ProductResponse> getAllProducts() {
@@ -67,16 +66,22 @@ public class ProductService {
     }
 
 
-    public boolean deleteProduct(int id) {
+    public void deleteProduct(int id) {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
-            product.setDeleted(true);
-            productRepository.save(product);
-            return true;
+            // Perform hard delete by calling delete method of the repository
+            productRepository.delete(product);
+        } else {
+            throw new ItemNotFoundException("Product with ID " + id + " not found.");
         }
-        return false;
     }
+
+    public Optional<ProductResponse> searchProduct(int id) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        return productOptional.map(this::convertToResponse);
+    }
+
     public String orderProduct(int productId, int quantity) {
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isEmpty()) {
@@ -110,6 +115,8 @@ public class ProductService {
         productResponse.setCreateAt(product.getCreateAt());
         productResponse.setUpdateAt(product.getUpdateAt());
         productResponse.setDeleted(product.isDeleted());
+        productResponse.setImage(product.getImage());
+        productResponse.setDescription(product.getDescription());
         return productResponse;
 
     }

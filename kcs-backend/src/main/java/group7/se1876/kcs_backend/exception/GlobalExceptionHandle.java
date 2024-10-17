@@ -1,11 +1,14 @@
 package group7.se1876.kcs_backend.exception;
 
+import group7.se1876.kcs_backend.dto.response.ErrorResponse;
 import jakarta.transaction.SystemException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 
@@ -97,4 +100,9 @@ public class GlobalExceptionHandle {
 
         return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
     }
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex, WebRequest request) {
+        return new ResponseEntity<>(new ErrorResponse("A runtime error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

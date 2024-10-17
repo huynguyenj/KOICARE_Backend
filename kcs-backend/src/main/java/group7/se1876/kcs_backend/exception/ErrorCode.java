@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatusCode;
 @Getter
 public enum ErrorCode {
     // No using 1010 it already used
- 
+
     INVALID_KEY(1000,"Invalid message key",HttpStatus.BAD_REQUEST),
     UNCATAGORIZED_EXCEPTION(9999,"Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     USER_EXISTED(1001, "User existed(please check your username or your email)",HttpStatus.BAD_REQUEST),
@@ -21,10 +21,12 @@ public enum ErrorCode {
     INVALID_INFOMATION(1007,"You need to check your information that it do not duplicated",HttpStatus.BAD_REQUEST),
     DATA_NOT_EXISTED(1008,"Your data is not existed",HttpStatus.BAD_REQUEST),
     DELETE_FAIL(1009,"Delete fail",HttpStatus.BAD_REQUEST),
+    UPDATE_FAIL(1010,"Update fail",HttpStatus.BAD_REQUEST),
     ORDER_DETAIL_NOT_FOUND(1011, "Order detail not found", HttpStatus.NOT_FOUND),
     ITEM_NOT_FOUND(1012, "Item not found", HttpStatus.NOT_FOUND),
     ITEM_EXISTED(1013, "Item existed", HttpStatus.BAD_REQUEST),
     OUT_OF_STOCK(1014, "Out of stock", HttpStatus.BAD_REQUEST),
+    PAYMENT_ERROR(1016, "Payment error", HttpStatus.BAD_REQUEST),
     INVALID_DATA_WITH_USERID(1015,"Please try again, something wrong with this userId",HttpStatus.BAD_REQUEST)
 
     ;
@@ -39,6 +41,7 @@ public enum ErrorCode {
     public String getMessage() {
         return message;
     }
+
 
     private HttpStatusCode statusCode;
 }

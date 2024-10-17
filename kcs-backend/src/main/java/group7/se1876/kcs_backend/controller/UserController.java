@@ -12,6 +12,7 @@ import group7.se1876.kcs_backend.service.BlogService;
 import group7.se1876.kcs_backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class UserController {
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.register(userDto,userRoleChoice));
 
-      return apiResponse;
+        return apiResponse;
     }
 
     //Get users (admin)
