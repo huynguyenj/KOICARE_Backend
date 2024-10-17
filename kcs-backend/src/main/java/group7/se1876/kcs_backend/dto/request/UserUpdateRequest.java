@@ -16,7 +16,6 @@ public class UserUpdateRequest {
     private Long userId;
     private String userName;
     @Size(min = 8, message = "INVALID_PASSWORD")
-    private String password;
     private String phone;
     private String email;
 

@@ -26,7 +26,7 @@ public class ProductService {
 
 
     public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
-
+        
         if (productRepository.existsByProductName(productRequest.getProductName())) {
             throw new ProductAlreadyExistsException("Product with name already exists.");
         }
