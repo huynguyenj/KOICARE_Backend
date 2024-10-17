@@ -120,7 +120,6 @@ public class UserImpl implements  UserService{
        
             User user = userRepository.findById(userId)
                 .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
-
         user.setUserName(newInfoUser.getUserName());
         user.setPassword(passwordEncoder.encode(newInfoUser.getPassword()));
         user.setPhone(newInfoUser.getPhone());
