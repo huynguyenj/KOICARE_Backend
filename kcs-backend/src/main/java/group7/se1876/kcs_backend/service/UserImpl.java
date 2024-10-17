@@ -162,6 +162,7 @@ public class UserImpl implements UserService {
     @Override
     public UserResponse updateUser(Long userId, UserUpdateRequest newInfoUser) {
 
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_USERID));
 
