@@ -26,38 +26,50 @@ public class ProductController {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-    @PostMapping(consumes = { "multipart/form-data" })
-    public ResponseEntity<ProductResponse> createProduct(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("productName") String productName,
-            @RequestParam("price") double price,
-            @RequestParam("category") String category,
-            @RequestParam("quantity") int quantity,
-            @RequestParam("description") String description) {
+//    @PostMapping(consumes = { "multipart/form-data" })
+//    public ResponseEntity<ProductResponse> createProduct(
+//            @RequestParam("file") MultipartFile file,
+//            @RequestParam("productName") String productName,
+//            @RequestParam("price") double price,
+//            @RequestParam("category") String category,
+//            @RequestParam("quantity") int quantity,
+//            @RequestParam("description") String description) {
+//        try {
+//            System.out.println("Product Name: " + productName);
+//            System.out.println("Price: " + price);
+//            System.out.println("Category: " + category);
+//            System.out.println("Quantity: " + quantity);
+//            System.out.println("Description: " + description);
+//
+//            String imageUrl = cloudinaryService.uploadFile(file);
+//            ProductRequest productRequest = new ProductRequest();
+//            productRequest.setProductName(productName);
+//            productRequest.setPrice(price);
+//            productRequest.setCategory(CategoryProduct.valueOf(category));
+//            productRequest.setQuantity(quantity);
+//            productRequest.setDescription(description);
+//            productRequest.setImage(imageUrl);
+//            ProductResponse productResponse = productService.createProduct(productRequest);
+//            return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
+//        } catch (ProductAlreadyExistsException e) {
+//            // Handle specific case when product already exists
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ProductResponse("Product already exists"));
+//        } catch (Exception e) {
+//            // Catch any other exceptions
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ProductResponse("Failed to create product"));
+//        }
+//    }
+    @PostMapping("/create")
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
         try {
-            System.out.println("Product Name: " + productName);
-            System.out.println("Price: " + price);
-            System.out.println("Category: " + category);
-            System.out.println("Quantity: " + quantity);
-            System.out.println("Description: " + description);
-
-            String imageUrl = cloudinaryService.uploadFile(file);
-            ProductRequest productRequest = new ProductRequest();
-            productRequest.setProductName(productName);
-            productRequest.setPrice(price);
-            productRequest.setCategory(CategoryProduct.valueOf(category));
-            productRequest.setQuantity(quantity);
-            productRequest.setDescription(description);
-            productRequest.setImage(imageUrl);
             ProductResponse productResponse = productService.createProduct(productRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
         } catch (ProductAlreadyExistsException e) {
-            // Handle specific case when product already exists
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ProductResponse("Product already exists"));
-        } catch (Exception e) {
-            // Catch any other exceptions
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ProductResponse("Failed to create product"));
         }
+    }
+    private String uploadFile(MultipartFile file) {
+        return cloudinaryService.uploadFile(file);
     }
 
 
