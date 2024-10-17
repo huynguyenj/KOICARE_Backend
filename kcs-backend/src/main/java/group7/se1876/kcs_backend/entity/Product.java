@@ -1,7 +1,6 @@
 package group7.se1876.kcs_backend.entity;
 
 import group7.se1876.kcs_backend.enums.CategoryProduct;
-import group7.se1876.kcs_backend.enums.ServiceType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +22,7 @@ public class Product {
     @Column(name = "product_name")
     private String productName;
 
-    @Column
+    @Column(nullable = false)
     private double price;
 
     @Column
@@ -38,6 +37,12 @@ public class Product {
 
     @Column
     private LocalDateTime updateAt;
+
+    @Column(name = "image")
+    private String image;
+
+    @Column(nullable = false)
+    private String description;
 
     @Column
     private boolean isDeleted;
