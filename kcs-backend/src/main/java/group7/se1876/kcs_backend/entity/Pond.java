@@ -26,7 +26,6 @@ public class Pond {
     private double volume;
     private int drainCount;
     private double pumpCapacity;
-    private double saltAmount;
     private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,4 +39,7 @@ public class Pond {
             inverseJoinColumns = @JoinColumn(name = "fish_id")
     )
     private List<Fish> fish;
+
+    @OneToOne(mappedBy = "pond", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private WaterParameter waterParameter;
 }

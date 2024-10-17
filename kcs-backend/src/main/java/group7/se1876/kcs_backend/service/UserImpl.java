@@ -12,6 +12,7 @@ import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.UserMapper;
 
 import group7.se1876.kcs_backend.repository.RoleRepository;
+import group7.se1876.kcs_backend.repository.TrackingUserRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -32,7 +33,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +53,7 @@ public class UserImpl implements UserService {
 
     //Register
     @Override
-    public UserResponse register(UserDto userRequest) {
+    public UserResponse register(UserDto userRequest, String userRoleChoice) {
 
         // Map data object to entity
         if (userRepository.existsByUserName(userRequest.getUserName()) || userRepository.existsByEmail(userRequest.getEmail())) {
@@ -62,19 +65,31 @@ public class UserImpl implements UserService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
-        //Set new role for user is USER ROLE
-        RoleDetail userRole = roleRepository.findByRoleType(Role.USER.name())
-                .orElseGet(() -> {
-                    RoleDetail newRole = new RoleDetail();
-                    newRole.setRoleType(Role.USER.name());
-                    return roleRepository.save(newRole);
-                });
-
         HashSet<RoleDetail> roles = new HashSet<>();
-        roles.add(userRole);
-        user.setRoles(roles);
+        //Set shop role if user choose role shop when register
+        if (userRoleChoice.equalsIgnoreCase("shop")){
+            RoleDetail userRole = roleRepository.findByRoleType(Role.SHOP.name())
+                    .orElseGet(()->{
+                        RoleDetail newRole = new RoleDetail();
+                        newRole.setRoleType(Role.SHOP.name());
+                        return roleRepository.save(newRole);
+                    });
 
-        // Save data already map to entity to database
+            roles.add(userRole);
+            user.setRoles(roles);
+        }else {
+            //Set new role for user is USER ROLE
+            RoleDetail userRole = roleRepository.findByRoleType(Role.USER.name())
+                    .orElseGet(()->{
+                        RoleDetail newRole = new RoleDetail();
+                        newRole.setRoleType(Role.USER.name());
+                        return roleRepository.save(newRole);
+                    });
+
+            roles.add(userRole);
+            user.setRoles(roles);
+        }
+
         User saveUser = userRepository.save(user);
 //        String token = UUID.randomUUID().toString();
 //        VerificationToken verificationToken = VerificationToken.builder()
@@ -161,6 +176,7 @@ public class UserImpl implements UserService {
         return userMapper.mapToUserResponse(userRepository.save(user));
     }
 
+    //Delete user
     @Override
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteUser(Long userId) {
@@ -185,5 +201,39 @@ public class UserImpl implements UserService {
         }
 
         return userMapper.mapToUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse setRole(Long userId, String role) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new AppException((ErrorCode.INVALID_USERID)));
+
+        RoleDetail roleDetail;
+
+        switch (role.toLowerCase()) {
+            case "shop":
+                roleDetail = roleRepository.findByRoleType(Role.SHOP.name())
+                        .orElseGet(() -> {
+                            RoleDetail newRole = new RoleDetail();
+                            newRole.setRoleType(Role.SHOP.name());
+                            return roleRepository.save(newRole);
+                        });
+                user.getRoles().add(roleDetail);
+                break;
+
+            case "unshop":
+                // Logic for removing the 'shop' role
+               Set<RoleDetail> roles = user.getRoles();
+               roles.removeIf(rol->rol.getRoleType().equalsIgnoreCase("shop"));
+                break;
+
+            default:
+                throw new IllegalArgumentException("Invalid role type: " + role);
+        }
+
+        userRepository.save(user);
+
+        return userMapper.mapToUserResponse(user);
     }
 }

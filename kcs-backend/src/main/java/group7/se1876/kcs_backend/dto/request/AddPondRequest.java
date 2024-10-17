@@ -21,7 +21,6 @@ public class AddPondRequest {
     private double volume;
     private int drainCount;
     private double pumpCapacity;
-    private double saltAmount;
 
 
 

@@ -5,6 +5,7 @@ import group7.se1876.kcs_backend.dto.request.AuthenticationRequest;
 import group7.se1876.kcs_backend.dto.request.LogoutRequest;
 import group7.se1876.kcs_backend.dto.request.VerifyTokenRequest;
 import group7.se1876.kcs_backend.dto.response.AuthenticationResponse;
+import group7.se1876.kcs_backend.dto.response.TrackingUserResponse;
 import group7.se1876.kcs_backend.dto.response.VerifyTokenResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.AuthenticationService;
@@ -58,5 +59,15 @@ public class AuthenticationController {
         authenticationService.logout(request);
 
         return new ApiResponse<>();
+    }
+
+    //Count login user
+    @GetMapping("/trackingLogin")
+    public ApiResponse<TrackingUserResponse> countLogin(){
+
+        ApiResponse<TrackingUserResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(authenticationService.countLoginUser());
+
+        return apiResponse;
     }
 }
