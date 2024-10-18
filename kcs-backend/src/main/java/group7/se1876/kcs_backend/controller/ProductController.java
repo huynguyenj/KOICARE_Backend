@@ -85,6 +85,12 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductResponse>> getAllProductsInShop() {
+        List<ProductResponse> products = productService.getAllProductsInShop();
+        return ResponseEntity.ok(products);
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable int id, @RequestBody ProductRequest productRequest) {
         Optional<ProductResponse> updatedProduct = productService.updateProduct(id, productRequest);

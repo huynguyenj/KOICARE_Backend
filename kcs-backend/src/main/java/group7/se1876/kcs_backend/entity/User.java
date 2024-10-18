@@ -45,4 +45,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Blog> blogs;
+
+    @OneToOne(mappedBy = "ownerShop", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
+    private Shop shop;
 }
