@@ -24,6 +24,7 @@ public class ProductResponse {
     private boolean isDeleted;
     private String image;
     private String description;
+    private String shopName;
 
 
     public ProductResponse(String productAlreadyExists) {

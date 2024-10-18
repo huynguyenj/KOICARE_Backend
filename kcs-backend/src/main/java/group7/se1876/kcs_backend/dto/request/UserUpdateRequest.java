@@ -12,13 +12,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class  UserUpdateRequest {
+public class UserUpdateRequest {
     private Long userId;
     private String userName;
     @Size(min = 8, message = "INVALID_PASSWORD")
-    private String password;
-    private Long phone;
+    private String phone;
     private String email;
-    private boolean status;
-    private List<String> roles;
+
 }

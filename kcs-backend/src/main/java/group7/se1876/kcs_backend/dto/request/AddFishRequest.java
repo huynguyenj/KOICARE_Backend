@@ -20,7 +20,9 @@ public class AddFishRequest {
     private int fishAge;
     private double fishWeight;
     private String fishGender;
+    private String fishHealth;
     private String fishType;
     private String origin;
     private double price;
+
 }

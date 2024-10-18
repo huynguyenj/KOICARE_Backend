@@ -15,7 +15,7 @@ public class UserDto {
     private String userName;
     @Size(min = 8, message = "INVALID_PASSWORD")
     private String password;
-    private Long phone;
+    private String phone;
     private String email;
     private boolean status;
 }
