@@ -23,5 +23,6 @@ public class Transaction {
     private String username;
     private String details;
     private Date date;
+    private String bankCode;
     private Double amount;
 }
