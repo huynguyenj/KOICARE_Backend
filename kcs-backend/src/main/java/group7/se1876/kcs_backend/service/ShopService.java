@@ -79,6 +79,7 @@ public class ShopService {
 
         User owner = shop.getOwnerShop();
         owner.setShop(null);
+        userRepository.save(owner);
 
         System.out.println("Deleting shop with ID: " + shopId);
         shopRepository.deleteById(shopId);

@@ -17,7 +17,7 @@ public class ShopMapper {
                 request.getEmail(),
                 request.getContactInfo(),
                 request.isStatus(),
-//                null,
+                null,
                 null
         );
     }

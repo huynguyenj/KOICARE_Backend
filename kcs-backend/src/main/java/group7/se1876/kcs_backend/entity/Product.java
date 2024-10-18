@@ -51,8 +51,8 @@ public class Product {
     @Transient
     private List<OrderDetail> orderDetails;
 
-//    @ManyToOne
-//    @JoinColumn(name = "shop_id")
-//    private Shop shop;
+    @ManyToOne
+    @JoinColumn(name = "shop_id")
+    private Shop shop;
 
 }

@@ -25,8 +25,8 @@ public class Shop {
     private String contactInfo;
     private boolean status;
 
-//    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
-//    private List<Product> products;
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
+    private List<Product> products;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
