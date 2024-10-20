@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 public class AddPondRequest {
     private Long pondId;
     private String pondName;
-    private String pondImg;
+    private MultipartFile pondImg;
     private double size;
     private double depth;
     private double volume;

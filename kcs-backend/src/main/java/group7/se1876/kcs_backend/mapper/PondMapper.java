@@ -19,7 +19,7 @@ public class PondMapper {
         return new Pond(
                 pondRequest.getPondId(),
                 pondRequest.getPondName(),
-                pondRequest.getPondImg(),
+                null,
                 pondRequest.getSize(),
                 pondRequest.getDepth(),
                 pondRequest.getVolume(),

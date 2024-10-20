@@ -30,7 +30,7 @@ public class PondController {
 
     //Add pond
     @PostMapping("/add_Pond")
-    public ApiResponse<PondResponse> createNewPond(@RequestBody AddPondRequest request){
+    public ApiResponse<PondResponse> createNewPond(@ModelAttribute AddPondRequest request){
 
         ApiResponse<PondResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(pondService.addPond(request));
