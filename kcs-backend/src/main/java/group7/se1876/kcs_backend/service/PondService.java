@@ -1,5 +1,6 @@
 package group7.se1876.kcs_backend.service;
 
+import com.google.cloud.storage.BlobInfo;
 import group7.se1876.kcs_backend.dto.request.AddPondRequest;
 import group7.se1876.kcs_backend.dto.request.PondUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.PondResponse;
@@ -17,11 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -31,17 +36,30 @@ public class PondService {
         private UserRepository userRepository;
         private FishRepository fishRepository;
         private PondMapper pondMapper;
+        private FirebaseStorageService firebaseStorageService;
+//        private final Storage storage = StorageOptions.getDefaultInstance().getService();
 
-        //Add pond
-        public PondResponse addPond(AddPondRequest request){
+    public PondResponse addPond(AddPondRequest request){
 
             Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
             User user = userRepository.findById(userId)
                     .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
 
-            Pond pond = pondMapper.mapToPond(request);
-            pond.setUser(user);
 
+            Pond pond = pondMapper.mapToPond(request);
+
+        // Upload image to Firebase
+        if (request.getPondImg() != null && !request.getPondImg().isEmpty()) {
+            try {
+                String imageUrl = firebaseStorageService.uploadFile(request.getPondImg());  // Corrected
+                pond.setPondImg(imageUrl);  // Assuming Pond entity has pondImg field
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FAIL_UPLOADFILE);
+            }
+        }
+
+
+            pond.setUser(user);
             pondRepository.save(pond);
 
             user.getPonds().add(pond);
@@ -146,4 +164,18 @@ public class PondService {
 
             return pondMapper.mapToPondResponse(pond);
     }
+
+//
+//    private String uploadImageToFirebase(MultipartFile file) throws IOException {
+//        String bucketName = "kcsswp.appspot.com"; // Replace with your bucket name
+//        String objectName = "pond-images/" + file.getOriginalFilename();
+//
+//        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
+//                .setContentType(file.getContentType())
+//                .build();
+//
+//        storage.create(blobInfo, file.getBytes());
+//
+//        return String.format("https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media", bucketName, objectName);
+//    }
 }

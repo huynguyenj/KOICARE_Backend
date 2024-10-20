@@ -27,8 +27,8 @@ public enum ErrorCode {
     ITEM_EXISTED(1013, "Item existed", HttpStatus.BAD_REQUEST),
     OUT_OF_STOCK(1014, "Out of stock", HttpStatus.BAD_REQUEST),
     PAYMENT_ERROR(1016, "Payment error", HttpStatus.BAD_REQUEST),
-    INVALID_DATA_WITH_USERID(1015,"Please try again, something wrong with this userId",HttpStatus.BAD_REQUEST)
-
+    INVALID_DATA_WITH_USERID(1015,"Please try again, something wrong with this userId",HttpStatus.BAD_REQUEST),
+    FAIL_UPLOADFILE(1016,"Failed to upload image ",HttpStatus.BAD_REQUEST)
     ;
 
     private int code;
