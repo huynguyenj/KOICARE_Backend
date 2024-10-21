@@ -45,7 +45,7 @@ public class PaymentService {
                         transaction.getId(),
                         transaction.getUsername(),
                         transaction.getDetails(),
-                        transaction.getDate().toString(),
+                        transaction.getDate(),
                         transaction.getAmount()
                 ))
                 .collect(Collectors.toList());
@@ -53,7 +53,7 @@ public class PaymentService {
 
     public String createPayment(PaymentRequest request) {
         try {
-            String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
             Map<String, String> vnp_Params = new HashMap<>();
             vnp_Params.put("vnp_Version", "2.1.0");
@@ -102,9 +102,10 @@ public class PaymentService {
 //            queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
             String vnp_SecureHash = hmacSHA512(vnp_HashSecret, hashData.toString());
             query.append("&vnp_SecureHash=").append(vnp_SecureHash);
-
+            User user= userRepository.findById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
             //Lưu token của người dùng với transaction reference
-            paymentTokens.put(vnp_Params.get("vnp_TxnRef"), userName);
+            paymentTokens.put(vnp_Params.get("vnp_TxnRef"), user.getUserName());
             return vnp_Url + "?" + query.toString();
 //            return vnp_Url + "?" + queryUrl;
         } catch (Exception e) {
@@ -113,7 +114,7 @@ public class PaymentService {
         }
     }
 
-    public boolean verifyPayment(Map<String, String> params) throws UnsupportedEncodingException {
+    public boolean verifyPayment(   Map<String, String> params) throws UnsupportedEncodingException {
         String vnp_SecureHash = params.get("vnp_SecureHash").toUpperCase();
         params.remove("vnp_SecureHash");
         params.remove("vnp_SecureHashType");
@@ -152,23 +153,21 @@ public class PaymentService {
         System.out.println("Response Code: " + responseCode);
         if ("00".equals(responseCode)) {
             System.out.println("Payment success!");
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            User user = userRepository.findByUserName(username)
+            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+            User user = userRepository.findById(userId)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
             long amount = Long.parseLong(params.get("vnp_Amount")) / 100;
             System.out.println("Parsed Amount: " + amount);
 
             // Lưu giao dịch vào cơ sở dữ liệu
             Transaction transaction = new Transaction();
-            transaction.setUsername(username);
+            transaction.setUsername(user.getUserName());
             transaction.setDetails("Thanh toan don hang:");
             transaction.setDate(new Date());
             transaction.setBankCode(params.get("vnp_BankCode"));
             transaction.setAmount((double) amount);
             transactionRepository.save(transaction);
 
-            // Cập nhật số dư người dùng
-            userRepository.save(user);
             return true;
         } else {
             log.info("Response code is not 00. Actual response: {}", responseCode);
