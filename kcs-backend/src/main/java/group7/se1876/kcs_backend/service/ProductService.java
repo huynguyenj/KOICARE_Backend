@@ -14,6 +14,7 @@ import group7.se1876.kcs_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,12 +36,15 @@ public class ProductService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
     public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
         Shop shop = shopRepository.findByOwnerShop_UserId(userId)
-                .orElseThrow(()->new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
 
         if (productRepository.existsByProductName(productRequest.getProductName())) {
             throw new ProductAlreadyExistsException("Product with name already exists.");
@@ -61,16 +65,27 @@ public class ProductService {
         return convertToResponse(savedProduct);
     }
 
+    public String uploadImage(MultipartFile file, int productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ItemNotFoundException("Product with ID " + productId + " not found."));
+
+        String imageUrl = cloudinaryService.uploadFile(file);
+        product.setImage(imageUrl);
+        productRepository.save(product);
+        return imageUrl;
+    }
+
+
     public Optional<ProductResponse> updateProduct(int id, ProductRequest productRequest) {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         Shop shop = shopRepository.findByOwnerShop_UserId(userId)
-                .orElseThrow(()->new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
 
         Product productCheck = productRepository.findById(id)
-                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_EXISTED));
 
-        if (productCheck.getShop().getShopId()!= shop.getShopId()){
+        if (productCheck.getShop().getShopId() != shop.getShopId()) {
             throw new AppException(ErrorCode.DATA_NOT_EXISTED);
         }
 
@@ -101,7 +116,7 @@ public class ProductService {
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
         Shop shop = shopRepository.findByOwnerShop_UserId(userId)
-                .orElseThrow(()->new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
 
         List<Product> products = shop.getProducts();
 
@@ -112,15 +127,15 @@ public class ProductService {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         Shop shop = shopRepository.findByOwnerShop_UserId(userId)
-                .orElseThrow(()->new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
 
         Product productCheck = productRepository.findById(id)
-                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_EXISTED));
 
-        if (productCheck.getShop().getShopId()!= shop.getShopId()){
+        if (productCheck.getShop().getShopId() != shop.getShopId()) {
             throw new AppException(ErrorCode.DATA_NOT_EXISTED);
         }
-            Optional<Product> productOptional = productRepository.findById(id);
+        Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
             // Perform hard delete by calling delete method of the repository

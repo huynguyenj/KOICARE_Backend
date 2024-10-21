@@ -23,42 +23,7 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
 
-//    @PostMapping(consumes = { "multipart/form-data" })
-//    public ResponseEntity<ProductResponse> createProduct(
-//            @RequestParam("file") MultipartFile file,
-//            @RequestParam("productName") String productName,
-//            @RequestParam("price") double price,
-//            @RequestParam("category") String category,
-//            @RequestParam("quantity") int quantity,
-//            @RequestParam("description") String description) {
-//        try {
-//            System.out.println("Product Name: " + productName);
-//            System.out.println("Price: " + price);
-//            System.out.println("Category: " + category);
-//            System.out.println("Quantity: " + quantity);
-//            System.out.println("Description: " + description);
-//
-//            String imageUrl = cloudinaryService.uploadFile(file);
-//            ProductRequest productRequest = new ProductRequest();
-//            productRequest.setProductName(productName);
-//            productRequest.setPrice(price);
-//            productRequest.setCategory(CategoryProduct.valueOf(category));
-//            productRequest.setQuantity(quantity);
-//            productRequest.setDescription(description);
-//            productRequest.setImage(imageUrl);
-//            ProductResponse productResponse = productService.createProduct(productRequest);
-//            return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
-//        } catch (ProductAlreadyExistsException e) {
-//            // Handle specific case when product already exists
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ProductResponse("Product already exists"));
-//        } catch (Exception e) {
-//            // Catch any other exceptions
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ProductResponse("Failed to create product"));
-//        }
-//    }
     @PostMapping("/create")
     public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
         try {
@@ -68,16 +33,20 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ProductResponse("Product already exists"));
         }
     }
-    private String uploadFile(MultipartFile file) {
-        return cloudinaryService.uploadFile(file);
-    }
 
+//    @PostMapping("/{productID}/upload")
+//    public ResponseEntity<String> uploadImage(@PathVariable int productID, @RequestParam("file") MultipartFile file) {
+//        try {
+//            System.out.println("File name: " + file.getOriginalFilename());
+//            System.out.println("File size: " + file.getSize());
+//
+//            String imageUrl = productService.uploadImage(file, productID);
+//            return ResponseEntity.ok(imageUrl);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image");
+//        }
+//    }
 
-    private String saveFile(MultipartFile file) {
-        String uploadDir = "path_to_save_images/";
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-        return "http://localhost:8080/images/" + file.getOriginalFilename();
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
@@ -91,15 +60,15 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable int id, @RequestBody ProductRequest productRequest) {
-        Optional<ProductResponse> updatedProduct = productService.updateProduct(id, productRequest);
+    @PutMapping("/update/{productID}")
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable int productID, @RequestBody ProductRequest productRequest) {
+        Optional<ProductResponse> updatedProduct = productService.updateProduct(productID, productRequest);
         return updatedProduct.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable int id) {
-        productService.deleteProduct(id);
+    @DeleteMapping("/delete/{productID}")
+    public ResponseEntity<String> deleteProduct(@PathVariable int productID) {
+        productService.deleteProduct(productID);
         return ResponseEntity.ok("Product deleted successfully");
     }
 
@@ -110,9 +79,9 @@ public class ProductController {
         return ResponseEntity.ok(message);
     }
 
-    @GetMapping("/search/{id}")
-    public ResponseEntity<ProductResponse> searchProduct(@PathVariable int id) {
-        Optional<ProductResponse> product = productService.searchProduct(id);
+    @GetMapping("/search/{productID}")
+    public ResponseEntity<ProductResponse> searchProduct(@PathVariable int productID) {
+        Optional<ProductResponse> product = productService.searchProduct(productID);
         return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
