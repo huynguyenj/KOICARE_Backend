@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class FishService {
     private UserRepository userRepository;
     private FishHistoriesRepository fishHistories;
     private FoodCalculationRepository foodCalculationRepository;
-
+    private FirebaseStorageService firebaseStorageService;
 
 
     //Add fish
@@ -43,6 +44,17 @@ public class FishService {
                 .orElseThrow(()-> new AppException(ErrorCode.INVALID_USERID));
 
         Fish fish = fishMapper.mapToFish(request);
+
+        // Upload image to Firebase
+        if (request.getFishImg() != null && !request.getFishImg().isEmpty()) {
+            try {
+                String imageUrl = firebaseStorageService.uploadFile(request.getFishImg(),"fishImg/");  // Corrected
+                fish.setFishImg(imageUrl);  // Assuming Pond entity has pondImg field
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FAIL_UPLOADFILE);
+            }
+        }
+
         fish.setOwner(user);
         fishRepository.save(fish);
 

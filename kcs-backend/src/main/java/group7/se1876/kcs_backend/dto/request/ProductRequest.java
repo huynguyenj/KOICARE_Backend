@@ -22,7 +22,7 @@ public class ProductRequest {
     private CategoryProduct category;
     @Min(1)
     private int quantity;
-    
+
     private String image;
     private String description;
 }

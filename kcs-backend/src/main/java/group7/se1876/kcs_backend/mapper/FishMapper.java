@@ -19,7 +19,7 @@ public class FishMapper {
         return new Fish(
                 request.getFishId(),
                 request.getFishName(),
-                request.getFishImg(),
+                null,
                 request.getFishSize(),
                 request.getFishShape(),
                 request.getFishAge(),
@@ -39,9 +39,9 @@ public class FishMapper {
     public static FishResponse mapToFishResponse(Fish fish) {
 
         List<KoiFishDevelopmentResponse> fishHistories = (fish.getFishDevelopmentHistories()!=null)
-        ?fish.getFishDevelopmentHistories().stream()
+                ?fish.getFishDevelopmentHistories().stream()
                 .map(fishDevelopmentHistory-> new KoiFishDevelopmentResponse(
-                       fishDevelopmentHistory.getHistoryId(),
+                        fishDevelopmentHistory.getHistoryId(),
                         fishDevelopmentHistory.getSize(),
                         fishDevelopmentHistory.getDate(),
                         fishDevelopmentHistory.getAge(),
@@ -55,7 +55,7 @@ public class FishMapper {
                 .collect(Collectors.toList())
                 : new ArrayList<>();
 
-                return new FishResponse(
+        return new FishResponse(
                 fish.getFishId(),
                 fish.getFishName(),
                 fish.getFishImg(),
@@ -68,8 +68,8 @@ public class FishMapper {
                 fish.getFishType(),
                 fish.getOrigin(),
                 fish.getPrice(),
-                        fishHistories,
-                        pondResponses
+                fishHistories,
+                pondResponses
 
         );
 

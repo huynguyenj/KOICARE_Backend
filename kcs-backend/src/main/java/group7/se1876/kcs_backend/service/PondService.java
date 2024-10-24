@@ -32,26 +32,25 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @AllArgsConstructor
 public class PondService {
-        private PondRepository pondRepository;
-        private UserRepository userRepository;
-        private FishRepository fishRepository;
-        private PondMapper pondMapper;
-        private FirebaseStorageService firebaseStorageService;
-//        private final Storage storage = StorageOptions.getDefaultInstance().getService();
+    private PondRepository pondRepository;
+    private UserRepository userRepository;
+    private FishRepository fishRepository;
+    private PondMapper pondMapper;
+    private FirebaseStorageService firebaseStorageService;
 
     public PondResponse addPond(AddPondRequest request){
 
-            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-            User user = userRepository.findById(userId)
-                    .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
 
 
-            Pond pond = pondMapper.mapToPond(request);
+        Pond pond = pondMapper.mapToPond(request);
 
         // Upload image to Firebase
         if (request.getPondImg() != null && !request.getPondImg().isEmpty()) {
             try {
-                String imageUrl = firebaseStorageService.uploadFile(request.getPondImg());  // Corrected
+                String imageUrl = firebaseStorageService.uploadFile(request.getPondImg(),"pond-images/");  // Corrected
                 pond.setPondImg(imageUrl);  // Assuming Pond entity has pondImg field
             } catch (IOException e) {
                 throw new AppException(ErrorCode.FAIL_UPLOADFILE);
@@ -59,25 +58,25 @@ public class PondService {
         }
 
 
-            pond.setUser(user);
-            pondRepository.save(pond);
+        pond.setUser(user);
+        pondRepository.save(pond);
 
-            user.getPonds().add(pond);
-            userRepository.save(user);
+        user.getPonds().add(pond);
+        userRepository.save(user);
 
-            return pondMapper.mapToPondResponse(pond);
+        return pondMapper.mapToPondResponse(pond);
 
-        }
+    }
 
-        //Get all ponds
+    //Get all ponds
     public List<PondResponse> getAllPonds(){
 
-            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
-            User user = userRepository.findById(userId)
-                    .orElseThrow(()-> new AppException(ErrorCode.INVALID_USERID));
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.INVALID_USERID));
 
-            Set<Pond> ponds = user.getPonds();
+        Set<Pond> ponds = user.getPonds();
 
         return ponds.stream().map((pond)-> pondMapper.mapToPondResponse(pond)).collect(Collectors.toList());
     }
@@ -85,97 +84,96 @@ public class PondService {
     //Get pond info
     public PondResponse getPondInfo(Long pondId){
 
-            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-            Pond pond = pondRepository.findById(pondId)
-                    .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
-            if(userId != pond.getUser().getUserId())
-                throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Pond pond = pondRepository.findById(pondId)
+                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+        if(userId != pond.getUser().getUserId())
+            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
 
-            return pondMapper.mapToPondResponse(pond);
+        return pondMapper.mapToPondResponse(pond);
     }
 
-        //Delete pond
+    //Delete pond
     public void deletePond(Long pondId){
 
-            Pond pond = pondRepository.findById(pondId)
-                    .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
+        Pond pond = pondRepository.findById(pondId)
+                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
 
-            User user= pond.getUser();
+        User user= pond.getUser();
 
-            try {
-                if (user!=null){
-                    user.getPonds().remove(pond);
-                    userRepository.save(user);
-                }
-            }catch (Exception e){
-                throw new AppException(ErrorCode.DELETE_FAIL);
+        try {
+            if (user!=null){
+                firebaseStorageService.deleteFile(pond.getPondImg());
+                user.getPonds().remove(pond);
+                userRepository.save(user);
             }
+        }catch (Exception e){
+            throw new AppException(ErrorCode.DELETE_FAIL);
+        }
 
-            pondRepository.delete(pond);
+        pondRepository.delete(pond);
 
     }
 
     //Update pond
     public PondResponse updatePond(Long pondId, PondUpdateRequest request){
 
-            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-            Pond pond = pondRepository.findById(pondId)
-                    .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Pond pond = pondRepository.findById(pondId)
+                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
 
-            if (userId != pond.getUser().getUserId())
-                throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+        if (userId != pond.getUser().getUserId())
+            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
 
 
-            pond.setPondName(request.getPondName());
-            pond.setPondImg(request.getPondImg());
-            pond.setDate(new Date());
-            pond.setDepth(request.getDepth());
-            pond.setDrainCount(request.getDrainCount());
-            pond.setPumpCapacity(request.getPumpCapacity());
-            pond.setSize(request.getSize());
-            pond.setVolume(request.getVolume());
+        pond.setPondName(request.getPondName());
 
-            pondRepository.save(pond);
+        // Upload image to Firebase
+        if (request.getPondImg() != null && !request.getPondImg().isEmpty()) {
+            try {
+                firebaseStorageService.deleteFile(pond.getPondImg());
+                String imageUrl = firebaseStorageService.uploadFile(request.getPondImg(),"pond-images/");  // Corrected
+                pond.setPondImg(imageUrl);  // Assuming Pond entity has pondImg field
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FAIL_UPLOADFILE);
+            }
+        }
 
-            return pondMapper.mapToPondResponse(pond);
+        pond.setDate(new Date());
+        pond.setDepth(request.getDepth());
+        pond.setDrainCount(request.getDrainCount());
+        pond.setPumpCapacity(request.getPumpCapacity());
+        pond.setSize(request.getSize());
+        pond.setVolume(request.getVolume());
+
+        pondRepository.save(pond);
+
+        return pondMapper.mapToPondResponse(pond);
 
     }
 
     //Add fish to pond
     public PondResponse addFishToPond(Long pondId,Long fishId){
 
-            Fish fish = fishRepository.findById(fishId)
+        Fish fish = fishRepository.findById(fishId)
                 .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
 
-            Pond pond = pondRepository.findById(pondId)
-                    .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
+        Pond pond = pondRepository.findById(pondId)
+                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
 
-            Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
-            if(fish.getOwner().getUserId() != userId || pond.getUser().getUserId() != userId){
-              throw  new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
-            }
+        if(fish.getOwner().getUserId() != userId || pond.getUser().getUserId() != userId){
+            throw  new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+        }
 
-            pond.getFish().add(fish);
-            pondRepository.save(pond);
+        pond.getFish().add(fish);
+        pondRepository.save(pond);
 
-            fish.getPonds().add(pond);
-            fishRepository.save(fish);
+        fish.getPonds().add(pond);
+        fishRepository.save(fish);
 
-            return pondMapper.mapToPondResponse(pond);
+        return pondMapper.mapToPondResponse(pond);
     }
 
-//
-//    private String uploadImageToFirebase(MultipartFile file) throws IOException {
-//        String bucketName = "kcsswp.appspot.com"; // Replace with your bucket name
-//        String objectName = "pond-images/" + file.getOriginalFilename();
-//
-//        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
-//                .setContentType(file.getContentType())
-//                .build();
-//
-//        storage.create(blobInfo, file.getBytes());
-//
-//        return String.format("https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media", bucketName, objectName);
-//    }
 }

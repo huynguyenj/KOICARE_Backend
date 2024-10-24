@@ -50,7 +50,7 @@ public class PondMapper {
                         fish.getPrice(),
                         fish.getOwner().getUserName())).collect(Collectors.toList()) : new ArrayList<>();
 
-                        return new PondResponse(
+        return new PondResponse(
                 pond.getPondId(),
                 pond.getPondName(),
                 pond.getPondImg(),
@@ -68,16 +68,16 @@ public class PondMapper {
     public static WaterParameter mapToWaterParameter(AddWaterParameterRequest request){
         return new WaterParameter(
 
-            request.getParameterId(),
-            request.getMeasurementTime(),
-            request.getTemperature(),
-            request.getSalinity(),
-            request.getPh(),
-            request.getO2(),
-            request.getNo2(),
-            request.getNo3(),
-            request.getPo4(),
-            null
+                request.getParameterId(),
+                request.getMeasurementTime(),
+                request.getTemperature(),
+                request.getSalinity(),
+                request.getPh(),
+                request.getO2(),
+                request.getNo2(),
+                request.getNo3(),
+                request.getPo4(),
+                null
         );
     }
 

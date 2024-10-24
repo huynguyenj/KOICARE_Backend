@@ -78,7 +78,7 @@ public class UserController {
     }
 
     //Delete user (admin)
-        @DeleteMapping("/delete/{userid}")
+    @DeleteMapping("/delete/{userid}")
     public ApiResponse<String> deleteUser(@PathVariable("userid") Long userId){
 
         userService.deleteUser(userId);
@@ -86,7 +86,7 @@ public class UserController {
         ApiResponse<String> result = new ApiResponse<>();
         result.setMessage("Delete succesfully");
 
-            return result;
+        return result;
     }
 
     //Set status user (admin)
@@ -111,7 +111,7 @@ public class UserController {
 
     //Post blog
     @PostMapping("/user/postBlog")
-    public ApiResponse<BlogResponse> addBlog(@RequestBody AddBlogRequest request){
+    public ApiResponse<BlogResponse> addBlog(@ModelAttribute AddBlogRequest request){
 
 
         ApiResponse<BlogResponse> apiResponse = new ApiResponse<>();
@@ -140,10 +140,20 @@ public class UserController {
 
         return apiResponse;
     }
+    //comment something
+    //get blog by id
+    @GetMapping("/user/getBlog/{blogId}")
+    public ApiResponse<BlogResponse> getBlog(@PathVariable("blogId")Long blogId){
+
+        ApiResponse<BlogResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(blogService.getBlog(blogId));
+
+        return apiResponse;
+    }
 
     //Update my blog
     @PutMapping("/user/updateMyBlog/{blogId}")
-    public ApiResponse<BlogResponse> updateMyBlog(@PathVariable("blogId") Long blogId,@RequestBody BlogUpdateRequest request){
+    public ApiResponse<BlogResponse> updateMyBlog(@PathVariable("blogId") Long blogId,@ModelAttribute BlogUpdateRequest request){
 
         ApiResponse<BlogResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(blogService.updateMyBlog(blogId,request));
