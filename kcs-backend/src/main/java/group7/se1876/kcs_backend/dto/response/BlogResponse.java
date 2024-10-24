@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -16,6 +17,6 @@ public class BlogResponse {
     private String image;
     private String title;
     private String content;
-    private Date publishedDate;
+    private LocalDate publishedDate;
     private String userName;
 }

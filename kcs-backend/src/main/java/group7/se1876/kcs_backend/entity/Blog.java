@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -20,8 +21,10 @@ public class Blog {
     private Long blogId;
     private String image;
     private String title;
+    @Lob
+    @Column(columnDefinition = "text")
     private String content;
-    private Date publishedDate;
+    private LocalDate publishedDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userId")

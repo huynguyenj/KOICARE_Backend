@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +37,8 @@ public class PaymentService {
     String vnp_HashSecret = "ZPQF7HG5PUJZVPPUG09WT6VFQ7X9GQAQ";
     String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     // Sử dụng vnp_ReturnUrl từ PaymentService1
-    String vnp_ReturnUrl = "http://localhost:8081/order-detail";
-    private final Map<String, String> paymentTokens = new HashMap<>();
+    String vnp_ReturnUrl = "http://localhost:8081/payment/verify";
+    private final Map<String, String> paymentTokens = new ConcurrentHashMap<>();
 
     public List<TransactionHistoryResponse> getTransactionHistory() {
         return transactionRepository.findAll().stream()
@@ -64,7 +65,7 @@ public class PaymentService {
             vnp_Params.put("vnp_BankCode", "NCB");
             vnp_Params.put("vnp_TxnRef", String.valueOf(System.currentTimeMillis()));
             vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_Params.get("vnp_TxnRef"));
-            vnp_Params.put("vnp_OrderType", "other");
+            vnp_Params.put("vnp_OrderType", request.getProductId() + ", Quantity: " + request.getQuantity());
             vnp_Params.put("vnp_Locale", "vn");
             vnp_Params.put("vnp_ReturnUrl", vnp_ReturnUrl);
             vnp_Params.put("vnp_IpAddr", request.getIpAddr());
@@ -97,30 +98,46 @@ public class PaymentService {
                     }
                 }
             }
-//            String queryUrl = query.toString();
-//            String vnp_SecureHash = hmacSHA512(vnp_HashSecret, hashData.toString());
-//            queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+
             String vnp_SecureHash = hmacSHA512(vnp_HashSecret, hashData.toString());
             query.append("&vnp_SecureHash=").append(vnp_SecureHash);
             User user= userRepository.findById(userId)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
             //Lưu token của người dùng với transaction reference
             paymentTokens.put(vnp_Params.get("vnp_TxnRef"), user.getUserName());
+
+            for (Map.Entry<String, String> entry : paymentTokens.entrySet()) {
+                System.out.println(entry.getValue());
+                log.info("TxnRef: {}, UserName: {}", entry.getKey(), entry.getValue());
+            }
             return vnp_Url + "?" + query.toString();
-//            return vnp_Url + "?" + queryUrl;
+
         } catch (Exception e) {
             log.error("Error occurred during payment creation: " + e.getMessage(), e);
             throw new AppException(ErrorCode.PAYMENT_ERROR);
         }
     }
 
-    public boolean verifyPayment(   Map<String, String> params) throws UnsupportedEncodingException {
+    public boolean verifyPayment( Map<String, String> params) throws UnsupportedEncodingException {
         String vnp_SecureHash = params.get("vnp_SecureHash").toUpperCase();
         params.remove("vnp_SecureHash");
         params.remove("vnp_SecureHashType");
 
         List<String> fieldNames = new ArrayList<>(params.keySet());
         Collections.sort(fieldNames);
+
+        for (Map.Entry<String, String> entry : paymentTokens.entrySet()) {
+            System.out.println(entry.getValue());
+            log.info("TxnRef: {}, UserName: {}", entry.getKey(), entry.getValue());
+        }
+        String vnp_TxnRef = params.get("vnp_TxnRef");
+        String userName = paymentTokens.get(params.get("vnp_TxnRef"));
+
+        if (userName == null) {
+            log.error("Transaction reference {} not found in paymentTokens.", vnp_TxnRef);
+            System.out.println("hello");
+            return false;
+        }
 
         StringBuilder hashData = new StringBuilder();
         for (String fieldName : fieldNames) {
@@ -162,11 +179,13 @@ public class PaymentService {
             // Lưu giao dịch vào cơ sở dữ liệu
             Transaction transaction = new Transaction();
             transaction.setUsername(user.getUserName());
-            transaction.setDetails("Thanh toan don hang:");
+            transaction.setDetails(params.get("vnp_OrderInfo"));
             transaction.setDate(new Date());
             transaction.setBankCode(params.get("vnp_BankCode"));
             transaction.setAmount((double) amount);
             transactionRepository.save(transaction);
+            System.out.println(params.get("productId"));
+            System.out.println("quantity");
 
             return true;
         } else {

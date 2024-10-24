@@ -49,7 +49,7 @@ public class UserImpl implements UserService {
     private RoleRepository roleRepository;
     private UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
-
+    private FirebaseStorageService firebaseStorageService;
 
     //Register
     @Override
@@ -224,8 +224,8 @@ public class UserImpl implements UserService {
 
             case "unshop":
                 // Logic for removing the 'shop' role
-               Set<RoleDetail> roles = user.getRoles();
-               roles.removeIf(rol->rol.getRoleType().equalsIgnoreCase("shop"));
+                Set<RoleDetail> roles = user.getRoles();
+                roles.removeIf(rol->rol.getRoleType().equalsIgnoreCase("shop"));
                 break;
 
             default:

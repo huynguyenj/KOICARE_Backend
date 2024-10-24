@@ -5,6 +5,7 @@ import group7.se1876.kcs_backend.dto.request.PaymentRequest;
 import group7.se1876.kcs_backend.dto.response.TransactionHistoryResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.PaymentService;
+import group7.se1876.kcs_backend.service.ProductService;
 import group7.se1876.kcs_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +24,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class PaymentController {
     PaymentService paymentService;
     UserService userService;
+    ProductService productService;
 
     @PostMapping("/create")
     public ApiResponse<String> createPayment(@RequestBody PaymentRequest request) {
@@ -45,6 +47,14 @@ public class PaymentController {
         try {
             boolean isSuccess = paymentService.verifyPayment(params);
             if (isSuccess) {
+                // Assuming you can extract productId and quantity from payment params
+//                int productId = Integer.parseInt(params.get("productId"));
+//                int quantity = Integer.parseInt(params.get("quantity"));
+//
+//                System.out.println(productId);
+//                System.out.println(quantity);
+                // Call the orderProduct method from the ProductService
+//                String message = productService.orderProduct(productId, quantity);
                 return ApiResponse.<String>builder()
                         .result("Payment success!")
                         .build();

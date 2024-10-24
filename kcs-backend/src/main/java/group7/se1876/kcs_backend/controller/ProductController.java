@@ -34,19 +34,6 @@ public class ProductController {
         }
     }
 
-//    @PostMapping("/{productID}/upload")
-//    public ResponseEntity<String> uploadImage(@PathVariable int productID, @RequestParam("file") MultipartFile file) {
-//        try {
-//            System.out.println("File name: " + file.getOriginalFilename());
-//            System.out.println("File size: " + file.getSize());
-//
-//            String imageUrl = productService.uploadImage(file, productID);
-//            return ResponseEntity.ok(imageUrl);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading image");
-//        }
-//    }
-
 
     @GetMapping("/all")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {

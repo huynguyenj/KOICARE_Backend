@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -14,7 +15,7 @@ import java.util.Date;
 public class AddFishRequest {
     private Long fishId;
     private String fishName;
-    private String fishImg;
+    private MultipartFile fishImg;
     private double fishSize;
     private String fishShape;
     private int fishAge;

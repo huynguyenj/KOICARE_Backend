@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 public class UserMapper {
     public static UserDto mapToUserDto(User user){
         return new UserDto(
-            user.getUserId(),
-            user.getUserName(),
-            user.getPassword(),
-            user.getPhone(),
-            user.getEmail(),
-            user.isStatus()
+                user.getUserId(),
+                user.getUserName(),
+                user.getPassword(),
+                user.getPhone(),
+                user.getEmail(),
+                user.isStatus()
         );
     }
     public static User mapToUser(UserDto userDto){
@@ -46,11 +46,11 @@ public class UserMapper {
 //                .map(roleDetail -> new RoleRespone(roleDetail.getRoleType())).collect(Collectors.toSet());
         Set<RoleRespone> role =
                 (user.getRoles() != null)
-                ? user.getRoles().stream()
-                .map(roleDetail -> new RoleRespone(roleDetail.getRoleType()))
-                .collect(Collectors.toSet())
-                : new HashSet<>();
-        
+                        ? user.getRoles().stream()
+                        .map(roleDetail -> new RoleRespone(roleDetail.getRoleType()))
+                        .collect(Collectors.toSet())
+                        : new HashSet<>();
+
         return new UserResponse(
                 user.getUserId(),
                 user.getUserName(),
@@ -64,7 +64,7 @@ public class UserMapper {
     public static Blog mapToBlog(AddBlogRequest request){
         return new Blog(
                 request.getBlogId(),
-                request.getImage(),
+                null,
                 request.getTitle(),
                 request.getContent(),
                 request.getPublishedDate(),

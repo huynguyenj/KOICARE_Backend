@@ -48,6 +48,7 @@ public class PondController {
         return listPonds;
     }
 
+    //Get pond
     @GetMapping("/getPondInfo/{pondid}")
     public ApiResponse<PondResponse> getPond(@PathVariable("pondid") Long pondId){
 
@@ -59,7 +60,7 @@ public class PondController {
 
     //Update pond
     @PutMapping("/update_Pond/{pondid}")
-    public ApiResponse<PondResponse> updatePondInfo(@PathVariable("pondid") Long pondId, @RequestBody PondUpdateRequest pondUpdateRequest){
+    public ApiResponse<PondResponse> updatePondInfo(@PathVariable("pondid") Long pondId, @ModelAttribute PondUpdateRequest pondUpdateRequest){
 
         ApiResponse<PondResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(pondService.updatePond(pondId,pondUpdateRequest));

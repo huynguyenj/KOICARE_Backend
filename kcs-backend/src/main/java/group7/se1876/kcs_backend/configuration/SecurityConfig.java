@@ -36,13 +36,13 @@ public class SecurityConfig {
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
-    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register","/auth/logout"};
+    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register","/auth/logout","/payment/verify"};
 //    private final String[] ADMIN_ENDPOINTS = {"/api/getUsers"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity    .cors(cors->cors.configurationSource(corsConfigurationSource()))
-                        .authorizeHttpRequests(request -> request
+                .authorizeHttpRequests(request -> request
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
 //                        .requestMatchers(HttpMethod.GET, ADMIN_ENDPOINTS).hasAuthority("ROLE_ADMIN")
                         .anyRequest()
@@ -50,10 +50,10 @@ public class SecurityConfig {
 
         //Validate jwt
         httpSecurity.oauth2ResourceServer(oauth2 ->
-                    oauth2.jwt(jwtConfigurer ->jwtConfigurer.decoder(customJwtDecoder)
-                            .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                            .authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // 401 error handle
-                );
+                oauth2.jwt(jwtConfigurer ->jwtConfigurer.decoder(customJwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // 401 error handle
+        );
         httpSecurity.csrf(AbstractHttpConfigurer::disable); //turn off csrf to avoid forbidden
 
         return httpSecurity.build();

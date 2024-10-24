@@ -141,7 +141,7 @@ public class WaterParameterService {
 
     }
 
-//    Update water parameter
+    //    Update water parameter
     public WaterParameterResponse updateWaterParameter(Long pondId,WaterParameterUpdateRequest request){
 
         Pond pond = pondRepository.findById(pondId)
@@ -187,7 +187,7 @@ public class WaterParameterService {
 
         switch (saltPercent){
             case "0.3":
-               result =  volume*0.003;
+                result =  volume*0.003;
                 break;
             case "0.5":
                 result =  volume*0.005;
