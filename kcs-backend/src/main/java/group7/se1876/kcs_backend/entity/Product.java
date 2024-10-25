@@ -41,7 +41,8 @@ public class Product {
     @Column(name = "image")
     private String image;
 
-    @Column(nullable = false)
+    @Lob
+    @Column(nullable = false,columnDefinition = "text")
     private String description;
 
     @Column

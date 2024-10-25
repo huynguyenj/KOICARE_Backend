@@ -1,12 +1,15 @@
 package group7.se1876.kcs_backend.service;
 
+import group7.se1876.kcs_backend.dto.request.AddOrderDetail;
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
+import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
 import group7.se1876.kcs_backend.entity.OrderDetail;
 import group7.se1876.kcs_backend.entity.Product;
 import group7.se1876.kcs_backend.entity.Shop;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.*;
+import group7.se1876.kcs_backend.mapper.ShopMapper;
 import group7.se1876.kcs_backend.repository.OrderDetailRepository;
 import group7.se1876.kcs_backend.repository.ProductRepository;
 import group7.se1876.kcs_backend.repository.ShopRepository;
@@ -16,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +43,11 @@ public class ProductService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
+    @Autowired
+    private FirebaseStorageService firebaseStorageService;
+
+    @Autowired
+    private ShopMapper shopMapper;
     public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -49,30 +58,32 @@ public class ProductService {
         if (productRepository.existsByProductName(productRequest.getProductName())) {
             throw new ProductAlreadyExistsException("Product with name already exists.");
         }
+
+
         Product product = Product.builder()
                 .productName(productRequest.getProductName())
                 .price(productRequest.getPrice())
                 .category(productRequest.getCategory())
                 .quantity(productRequest.getQuantity())
-                .image(productRequest.getImage())
                 .description(productRequest.getDescription())
                 .createAt(LocalDateTime.now())
                 .updateAt(LocalDateTime.now())
                 .isDeleted(false)
                 .shop(shop)
                 .build();
+
+        // Upload image to Firebase
+        if (productRequest.getImage() != null && !productRequest.getImage().isEmpty()) {
+            try {
+                String imageUrl = firebaseStorageService.uploadFile(productRequest.getImage(),"products/");  // Corrected
+                product.setImage(imageUrl);  // Assuming Pond entity has pondImg field
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FAIL_UPLOADFILE);
+            }
+        }
+
         Product savedProduct = productRepository.save(product);
         return convertToResponse(savedProduct);
-    }
-
-    public String uploadImage(MultipartFile file, int productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ItemNotFoundException("Product with ID " + productId + " not found."));
-
-        String imageUrl = cloudinaryService.uploadFile(file);
-        product.setImage(imageUrl);
-        productRepository.save(product);
-        return imageUrl;
     }
 
 
@@ -150,7 +161,10 @@ public class ProductService {
         return productOptional.map(this::convertToResponse);
     }
 
-    public String orderProduct(int productId, int quantity) {
+    public OrderDetailResponse orderProduct(int productId, Long shopId, AddOrderDetail request) {
+
+        Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
 
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isEmpty()) {
@@ -158,20 +172,25 @@ public class ProductService {
         }
         Product product = productOptional.get();
         //kiểm tra số lượng đặt hàng có lớn hơn số lượng tồn kho không
-        if (product.getQuantity() < quantity) {
+        if (product.getQuantity() < request.getQuantity()) {
             throw new OutOfStockException("Item with ID " + productId + " is out of stock.");
         }
         // Cap nhat so luong ton kho
-        product.setQuantity(product.getQuantity() - quantity);
+        product.setQuantity(product.getQuantity() - request.getQuantity());
         productRepository.save(product);
         // Tạo Order mới
         OrderDetail orderDetail = new OrderDetail();
         orderDetail.setProduct(product);
-        orderDetail.setQuantity(quantity);
-        orderDetail.setPrice(product.getPrice() * quantity);
+        orderDetail.setQuantity(request.getQuantity());
+        orderDetail.setPrice(product.getPrice() * request.getQuantity());
+        orderDetail.setAddress(request.getAddress());
+        orderDetail.setPhone(request.getPhone());
+        orderDetail.setUserName(request.getUserName());
+        orderDetail.setShop(shop);
+        orderDetail.setDate(request.getDate());
         // Lưu OrderDetail vào cơ sở dữ liệu
         orderDetailRepository.save(orderDetail);
-        return "Order placed  successfully.";
+        return shopMapper.mapToOrderDetailResponse(orderDetail);
     }
 
     private ProductResponse convertToResponse(Product product) {

@@ -4,6 +4,8 @@ package group7.se1876.kcs_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Builder
 @Getter
@@ -19,9 +21,6 @@ public class OrderDetail {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
     @Column
     private int quantity;
 
@@ -30,4 +29,21 @@ public class OrderDetail {
 
     @Column
     private boolean isDeleted;
+
+    @Column
+    private String userName;
+
+    @Column
+    private String address;
+
+    @Column
+    private String phone;
+
+    @Column
+    private LocalDate date;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shopId", referencedColumnName = "shopId")
+    private Shop shop;
+
 }

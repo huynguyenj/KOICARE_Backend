@@ -1,7 +1,9 @@
 package group7.se1876.kcs_backend.mapper;
 
 import group7.se1876.kcs_backend.dto.request.CreateShopRequest;
+import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ShopResponse;
+import group7.se1876.kcs_backend.entity.OrderDetail;
 import group7.se1876.kcs_backend.entity.Shop;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,7 @@ public class ShopMapper {
                 request.getContactInfo(),
                 request.isStatus(),
                 null,
+                null,
                 null
         );
     }
@@ -32,6 +35,17 @@ public class ShopMapper {
                 shop.getContactInfo(),
                 shop.isStatus(),
                 shop.getOwnerShop().getUserName()
+        );
+    }
+    public static OrderDetailResponse mapToOrderDetailResponse(OrderDetail orderDetail){
+        return new OrderDetailResponse(
+                orderDetail.getId(),
+                orderDetail.getQuantity(),
+                orderDetail.getPrice(),
+                orderDetail.getUserName(),
+                orderDetail.getAddress(),
+                orderDetail.getPhone(),
+                orderDetail.getDate()
         );
     }
 }

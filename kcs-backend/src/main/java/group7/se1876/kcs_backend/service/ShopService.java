@@ -2,7 +2,9 @@ package group7.se1876.kcs_backend.service;
 
 import group7.se1876.kcs_backend.dto.request.CreateShopRequest;
 import group7.se1876.kcs_backend.dto.request.UpdateShopRequest;
+import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ShopResponse;
+import group7.se1876.kcs_backend.entity.OrderDetail;
 import group7.se1876.kcs_backend.entity.Shop;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.AppException;
@@ -103,6 +105,18 @@ public class ShopService {
         List<Shop> shops = shopRepository.findAll();
 
         return shops.stream().map((shop)->shopMapper.mapToShopResponse(shop)).collect(Collectors.toList());
+    }
+
+    //Get All order
+    public List<OrderDetailResponse> getAllOrder(){
+
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Shop shop = shopRepository.findByOwnerShop_UserId(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+        List<OrderDetail> orderDetails = shop.getOrderDetails();
+
+        return orderDetails.stream().map((orderDetail) -> shopMapper.mapToOrderDetailResponse(orderDetail)).collect(Collectors.toList());
     }
 }
 
