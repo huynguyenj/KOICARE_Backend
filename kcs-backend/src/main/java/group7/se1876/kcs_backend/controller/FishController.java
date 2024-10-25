@@ -22,7 +22,7 @@ public class FishController {
 
     //Add fish
     @PostMapping("/add_Fish")
-    public ApiResponse<FishResponse> addFish(@RequestBody AddFishRequest request){
+    public ApiResponse<FishResponse> addFish(@ModelAttribute AddFishRequest request){
 
         ApiResponse<FishResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(fishService.addFish(request));
@@ -32,7 +32,7 @@ public class FishController {
 
     //Update fish
     @PutMapping("/update_Fish/{fishid}")
-    public ApiResponse<FishResponse> updateFish(@PathVariable("fishid") Long fishId ,@RequestBody FishUpdateRequest request){
+    public ApiResponse<FishResponse> updateFish(@PathVariable("fishid") Long fishId ,@ModelAttribute FishUpdateRequest request){
 
         ApiResponse<FishResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(fishService.updateFish(fishId,request));
@@ -62,7 +62,7 @@ public class FishController {
     }
 
     //Get fish info
-    @GetMapping("/getFish/{fishid}")
+        @GetMapping("/getFish/{fishid}")
     public ApiResponse<FishResponse> getFish(@PathVariable("fishid") Long fishId){
 
         ApiResponse <FishResponse> apiResponse = new ApiResponse<>();

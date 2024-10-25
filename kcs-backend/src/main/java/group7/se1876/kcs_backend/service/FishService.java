@@ -99,7 +99,16 @@ public class FishService {
             throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
 
         fish.setFishName(request.getFishName());
-        fish.setFishImg(request.getFishImg());
+        // Upload image to Firebase
+        if (request.getFishImg() != null && !request.getFishImg().isEmpty()) {
+            try {
+//                firebaseStorageService.deleteFile(fish.getFishImg());
+                String imageUrl = firebaseStorageService.uploadFile(request.getFishImg(),"fishImg/");  // Corrected
+                fish.setFishImg(imageUrl);  // Assuming Pond entity has pondImg field
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FAIL_UPLOADFILE);
+            }
+        }
         fish.setFishSize(request.getFishSize());
         fish.setFishShape(request.getFishShape());
         fish.setFishAge(request.getFishAge());

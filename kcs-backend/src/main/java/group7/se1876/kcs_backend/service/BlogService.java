@@ -102,7 +102,7 @@ public class BlogService {
         // Upload image to Firebase
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             try {
-                firebaseStorageService.deleteFile(blog.getImage());
+//                firebaseStorageService.deleteFile(blog.getImage());
                 String imageUrl = firebaseStorageService.uploadFile(request.getImage(),"blog-images/");
                 blog.setImage(imageUrl);
             } catch (IOException e) {
