@@ -103,7 +103,7 @@ public class PondService {
 
         try {
             if (user!=null){
-                firebaseStorageService.deleteFile(pond.getPondImg());
+//                firebaseStorageService.deleteFile(pond.getPondImg());
                 user.getPonds().remove(pond);
                 userRepository.save(user);
             }
@@ -131,7 +131,7 @@ public class PondService {
         // Upload image to Firebase
         if (request.getPondImg() != null && !request.getPondImg().isEmpty()) {
             try {
-                firebaseStorageService.deleteFile(pond.getPondImg());
+//                firebaseStorageService.deleteFile(pond.getPondImg());
                 String imageUrl = firebaseStorageService.uploadFile(request.getPondImg(),"pond-images/");  // Corrected
                 pond.setPondImg(imageUrl);  // Assuming Pond entity has pondImg field
             } catch (IOException e) {
