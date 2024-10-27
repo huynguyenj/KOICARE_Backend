@@ -63,11 +63,11 @@ public class ProductController {
     }
 
 
-    @PostMapping("/order/{productID}/{shopId}")
-    public ApiResponse<OrderDetailResponse> orderProduct(@PathVariable int productID, @PathVariable("shopId") Long shopId, @RequestBody AddOrderDetail request) {
+    @PostMapping("/order")
+    public ApiResponse<List<OrderDetailResponse>> orderProduct(@RequestBody AddOrderDetail request) {
 
-        ApiResponse<OrderDetailResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(productService.orderProduct(productID,shopId,request));
+        ApiResponse<List<OrderDetailResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productService.orderProduct(request));
 
         return apiResponse;
     }

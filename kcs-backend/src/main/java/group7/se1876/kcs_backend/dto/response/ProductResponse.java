@@ -25,7 +25,7 @@ public class ProductResponse {
     private String image;
     private String description;
     private String shopName;
-
+    private Long shopId;
 
     public ProductResponse(String productAlreadyExists) {
     }

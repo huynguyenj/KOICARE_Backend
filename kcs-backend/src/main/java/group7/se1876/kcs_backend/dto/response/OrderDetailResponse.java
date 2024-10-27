@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,5 +27,5 @@ public class OrderDetailResponse {
 
     private String phone;
 
-    private LocalDate date;
+    private Date date;
 }

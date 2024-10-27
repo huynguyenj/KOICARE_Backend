@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Builder
@@ -40,7 +41,7 @@ public class OrderDetail {
     private String phone;
 
     @Column
-    private LocalDate date;
+    private Date date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shopId", referencedColumnName = "shopId")

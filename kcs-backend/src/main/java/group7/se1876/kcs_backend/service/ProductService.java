@@ -1,6 +1,7 @@
 package group7.se1876.kcs_backend.service;
 
 import group7.se1876.kcs_backend.dto.request.AddOrderDetail;
+import group7.se1876.kcs_backend.dto.request.OrderRequest;
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -161,36 +164,37 @@ public class ProductService {
         return productOptional.map(this::convertToResponse);
     }
 
-    public OrderDetailResponse orderProduct(int productId, Long shopId, AddOrderDetail request) {
+    public List<OrderDetailResponse> orderProduct(AddOrderDetail request) {
 
-        Shop shop = shopRepository.findById(shopId)
-                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
+        List<OrderDetailResponse> responses = new ArrayList<>();
+        for (OrderRequest item: request.getOrder()) {
+            Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_EXISTED));
+            if (product.getQuantity() < item.getQuantity()) {
+                throw new OutOfStockException("Item with ID " + item.getProductId()+ " is out of stock.");
+            }
+            Shop shop = shopRepository.findById(item.getShopId())
+                    .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
 
-        Optional<Product> productOptional = productRepository.findById(productId);
-        if (productOptional.isEmpty()) {
-            throw new ItemNotFoundException("Item with ID " + productId + " not found.");
+            //Cập nhật hàng tồn kho
+            product.setQuantity(product.getQuantity() - item.getQuantity());
+            productRepository.save(product);
+            // Tạo Order mới
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setProduct(product);
+            orderDetail.setQuantity(item.getQuantity());
+            orderDetail.setPrice(product.getPrice() * item.getQuantity());
+            orderDetail.setAddress(request.getAddress());
+            orderDetail.setPhone(request.getPhone());
+            orderDetail.setUserName(request.getUserName());
+            orderDetail.setShop(shop);
+            orderDetail.setDate(new Date());
+            // Lưu OrderDetail vào cơ sở dữ liệu
+            orderDetailRepository.save(orderDetail);
+
+            responses.add(shopMapper.mapToOrderDetailResponse(orderDetail));
         }
-        Product product = productOptional.get();
-        //kiểm tra số lượng đặt hàng có lớn hơn số lượng tồn kho không
-        if (product.getQuantity() < request.getQuantity()) {
-            throw new OutOfStockException("Item with ID " + productId + " is out of stock.");
-        }
-        // Cap nhat so luong ton kho
-        product.setQuantity(product.getQuantity() - request.getQuantity());
-        productRepository.save(product);
-        // Tạo Order mới
-        OrderDetail orderDetail = new OrderDetail();
-        orderDetail.setProduct(product);
-        orderDetail.setQuantity(request.getQuantity());
-        orderDetail.setPrice(product.getPrice() * request.getQuantity());
-        orderDetail.setAddress(request.getAddress());
-        orderDetail.setPhone(request.getPhone());
-        orderDetail.setUserName(request.getUserName());
-        orderDetail.setShop(shop);
-        orderDetail.setDate(request.getDate());
-        // Lưu OrderDetail vào cơ sở dữ liệu
-        orderDetailRepository.save(orderDetail);
-        return shopMapper.mapToOrderDetailResponse(orderDetail);
+        return responses;
     }
 
     private ProductResponse convertToResponse(Product product) {
@@ -207,6 +211,7 @@ public class ProductService {
         productResponse.setImage(product.getImage());
         productResponse.setDescription(product.getDescription());
         productResponse.setShopName(product.getShop().getShopName());
+        productResponse.setShopId(product.getShop().getShopId());
         return productResponse;
 
     }

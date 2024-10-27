@@ -36,14 +36,14 @@ public class SecurityConfig {
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
-    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register","/auth/logout","/payment/verify"};
+    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register","/auth/logout","/payment/verify","/api/user/getAllBlogs","/api/user/getBlog/{blogId}"};
 //    private final String[] ADMIN_ENDPOINTS = {"/api/getUsers"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity    .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
 //                        .requestMatchers(HttpMethod.GET, ADMIN_ENDPOINTS).hasAuthority("ROLE_ADMIN")
                         .anyRequest()
                         .authenticated()); // any method with PUBLIC_ENDPOINTS is allowed to access without security check

@@ -5,17 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class AddFishDevelopmentHistoryRequest {
-    private Long historyId;
-    private double size;
-    private int age;
-    private double weight;
-    private Date date;
+public class OrderRequest {
+    private int productId;
+    private int quantity;
+    private Long shopId;
 }

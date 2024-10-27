@@ -37,7 +37,7 @@ public class PaymentService {
     String vnp_HashSecret = "ZPQF7HG5PUJZVPPUG09WT6VFQ7X9GQAQ";
     String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     // Sử dụng vnp_ReturnUrl từ PaymentService1
-    String vnp_ReturnUrl = "http://localhost:8081/payment/verify";
+    String vnp_ReturnUrl = "http://localhost:5173/userhome/paymentSuccess";
     private final Map<String, String> paymentTokens = new ConcurrentHashMap<>();
 
     public List<TransactionHistoryResponse> getTransactionHistory() {
@@ -65,7 +65,7 @@ public class PaymentService {
             vnp_Params.put("vnp_BankCode", "NCB");
             vnp_Params.put("vnp_TxnRef", String.valueOf(System.currentTimeMillis()));
             vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_Params.get("vnp_TxnRef"));
-            vnp_Params.put("vnp_OrderType", request.getProductId() + ", Quantity: " + request.getQuantity());
+            vnp_Params.put("vnp_OrderType", "order");
             vnp_Params.put("vnp_Locale", "vn");
             vnp_Params.put("vnp_ReturnUrl", vnp_ReturnUrl);
             vnp_Params.put("vnp_IpAddr", request.getIpAddr());
@@ -131,13 +131,7 @@ public class PaymentService {
             log.info("TxnRef: {}, UserName: {}", entry.getKey(), entry.getValue());
         }
         String vnp_TxnRef = params.get("vnp_TxnRef");
-        String userName = paymentTokens.get(params.get("vnp_TxnRef"));
 
-        if (userName == null) {
-            log.error("Transaction reference {} not found in paymentTokens.", vnp_TxnRef);
-            System.out.println("hello");
-            return false;
-        }
 
         StringBuilder hashData = new StringBuilder();
         for (String fieldName : fieldNames) {
@@ -184,8 +178,7 @@ public class PaymentService {
             transaction.setBankCode(params.get("vnp_BankCode"));
             transaction.setAmount((double) amount);
             transactionRepository.save(transaction);
-            System.out.println(params.get("productId"));
-            System.out.println("quantity");
+
 
             return true;
         } else {

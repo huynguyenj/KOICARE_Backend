@@ -87,37 +87,37 @@ public class WaterParameterService {
 
         // Check temperature
         if ( waterParameter.getTemperature()< IDEAL_TEMPERATURE_MIN || waterParameter.getTemperature() > IDEAL_TEMPERATURE_MAX) {
-            recommendations.put("Temperature", "Adjust temperature to between " + IDEAL_TEMPERATURE_MIN + " and " + IDEAL_TEMPERATURE_MAX + " °C.");
+            recommendations.put("Nhiệt độ", "Bạn nên để nhiệt độ ở giữa " + IDEAL_TEMPERATURE_MIN + " và " + IDEAL_TEMPERATURE_MAX + " °C.");
         }
 
         // Check salinity
         if (waterParameter.getSalinity() < IDEAL_SALINITY_MIN || waterParameter.getSalinity() > IDEAL_SALINITY_MAX) {
-            recommendations.put("Salinity", "Adjust salinity to between " + IDEAL_SALINITY_MIN + " and " + IDEAL_SALINITY_MAX + " ppt.");
+            recommendations.put("Độ mặn", "Bạn nên điều chỉnh độ mặn ở giữa " + IDEAL_SALINITY_MIN + " và " + IDEAL_SALINITY_MAX + " ppt.");
         }
 
         // Check pH
         if (waterParameter.getPh() < IDEAL_PH_MIN || waterParameter.getPh() > IDEAL_PH_MAX) {
-            recommendations.put("pH", "Adjust pH to between " + IDEAL_PH_MIN + " and " + IDEAL_PH_MAX + ".");
+            recommendations.put("pH", "Bạn nên điều chỉnh độ pH giữa khoảng " + IDEAL_PH_MIN + " và " + IDEAL_PH_MAX + ".");
         }
 
         // Check O2
         if (waterParameter.getO2() < IDEAL_O2_MIN || waterParameter.getO2() > IDEAL_O2_MAX) {
-            recommendations.put("O2", "Adjust O2 levels to between " + IDEAL_O2_MIN + " and " + IDEAL_O2_MAX + " mg/L.");
+            recommendations.put("O2", "Bạn nên điều chỉnh nồng độ O2 giữa khoảng " + IDEAL_O2_MIN + " và " + IDEAL_O2_MAX + " mg/L.");
         }
 
         // Check NO2
         if (waterParameter.getNo2() > IDEAL_NO2_MAX) {
-            recommendations.put("NO2", "NO2 levels should be 0.0 mg/L. Take measures to reduce NO2.");
+            recommendations.put("NO2", "Nồng độ NO2 nên ở  0.0 mg/L. Hãy thực hiện quy trình giảm lại lượng NO2.");
         }
 
         // Check NO3
         if (waterParameter.getNo3() > IDEAL_NO3_MAX) {
-            recommendations.put("NO3", "Adjust NO3 levels to below " + IDEAL_NO3_MAX + " mg/L.");
+            recommendations.put("NO3", "Bạn nên điều chỉnh nồng độ NO3 dưới " + IDEAL_NO3_MAX + " mg/L.");
         }
 
         // Check PO4
         if (waterParameter.getPo4() > IDEAL_PO4_MAX) {
-            recommendations.put("PO4", "Adjust PO4 levels to below " + IDEAL_PO4_MAX + " mg/L.");
+            recommendations.put("PO4", "Bạn nên điều chỉnh nồng độ PO4 dưới " + IDEAL_PO4_MAX + " mg/L.");
         }
 
         return recommendations;

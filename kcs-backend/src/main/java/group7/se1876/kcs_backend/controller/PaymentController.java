@@ -47,24 +47,19 @@ public class PaymentController {
         try {
             boolean isSuccess = paymentService.verifyPayment(params);
             if (isSuccess) {
-                // Assuming you can extract productId and quantity from payment params
-//                int productId = Integer.parseInt(params.get("productId"));
-//                int quantity = Integer.parseInt(params.get("quantity"));
-//
-//                System.out.println(productId);
-//                System.out.println(quantity);
-                // Call the orderProduct method from the ProductService
-//                String message = productService.orderProduct(productId, quantity);
                 return ApiResponse.<String>builder()
+                        .code(0)
                         .result("Payment success!")
                         .build();
             } else {
                 return ApiResponse.<String>builder()
+                        .code(1)
                         .result("Payment verification failed!")
                         .build();
             }
         } catch (Exception e) {
             return ApiResponse.<String>builder()
+                    .code(-1)
                     .result("Payment verification failed!")
                     .build();
         }
