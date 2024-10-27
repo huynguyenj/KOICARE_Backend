@@ -2,7 +2,9 @@ package group7.se1876.kcs_backend.controller;
 
 import group7.se1876.kcs_backend.dto.request.CreateShopRequest;
 import group7.se1876.kcs_backend.dto.request.UpdateShopRequest;
+import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ShopResponse;
+import group7.se1876.kcs_backend.entity.OrderDetail;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.ShopService;
 import jakarta.validation.Valid;
@@ -63,6 +65,14 @@ public class ShopController {
         ApiResponse<List<ShopResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setResult(shopService.getALlShop());
 
+        return apiResponse;
+    }
+
+    //Get Order
+    @GetMapping("/getOrder")
+    public ApiResponse<List<OrderDetailResponse>> getAllOrderDetail(){
+        ApiResponse<List<OrderDetailResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(shopService.getAllOrder());
         return apiResponse;
     }
 

@@ -1,9 +1,12 @@
 package group7.se1876.kcs_backend.controller;
 
+import group7.se1876.kcs_backend.dto.request.AddOrderDetail;
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.ErrorResponse;
+import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
 import group7.se1876.kcs_backend.enums.CategoryProduct;
+import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.exception.ProductAlreadyExistsException;
 import group7.se1876.kcs_backend.service.CloudinaryService;
 import group7.se1876.kcs_backend.service.ProductService;
@@ -25,7 +28,7 @@ public class ProductController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest productRequest) {
+    public ResponseEntity<ProductResponse> createProduct(@ModelAttribute ProductRequest productRequest) {
         try {
             ProductResponse productResponse = productService.createProduct(productRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
@@ -60,10 +63,13 @@ public class ProductController {
     }
 
 
-    @PostMapping("/order/{productID}")
-    public ResponseEntity<String> orderProduct(@PathVariable int productID, @RequestParam int quantity) {
-        String message = productService.orderProduct(productID, quantity);
-        return ResponseEntity.ok(message);
+    @PostMapping("/order")
+    public ApiResponse<List<OrderDetailResponse>> orderProduct(@RequestBody AddOrderDetail request) {
+
+        ApiResponse<List<OrderDetailResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productService.orderProduct(request));
+
+        return apiResponse;
     }
 
     @GetMapping("/search/{productID}")

@@ -83,10 +83,10 @@ public class PondController {
 
     //Add fish to pond
     @PutMapping("/addFishToPond/pond/{pondid}/fish/{fishid}")
-    public ApiResponse<PondResponse> updatePondInfo(@PathVariable("pondid") Long pondId, @PathVariable("fishid") Long fishid){
+    public ApiResponse<PondResponse> updatePondInfo(@PathVariable("pondid") Long pondId, @PathVariable("fishid") Long fishId){
 
         ApiResponse<PondResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(pondService.addFishToPond(pondId,fishid));
+        apiResponse.setResult(pondService.addFishToPond(pondId,fishId));
 
         return apiResponse;
 

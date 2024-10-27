@@ -31,4 +31,7 @@ public class Shop {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User ownerShop;
+
+    @OneToMany(mappedBy = "shop",cascade = CascadeType.ALL)
+    private List<OrderDetail> orderDetails;
 }

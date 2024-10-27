@@ -19,10 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -165,6 +162,13 @@ public class PondService {
 
         if(fish.getOwner().getUserId() != userId || pond.getUser().getUserId() != userId){
             throw  new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+        }
+
+        if (!fish.getPonds().isEmpty()){
+            for (Pond oldPond: new ArrayList<>(fish.getPonds())){
+                oldPond.getFish().remove(fish);
+                pondRepository.save(oldPond);
+            }
         }
 
         pond.getFish().add(fish);

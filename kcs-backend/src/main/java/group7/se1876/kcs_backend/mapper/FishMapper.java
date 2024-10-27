@@ -78,7 +78,7 @@ public class FishMapper {
     public static FishDevelopmentHistory mapToFishHistory(AddFishDevelopmentHistoryRequest request) {
         return new FishDevelopmentHistory(
                 request.getHistoryId(),
-                new Date(),
+                request.getDate(),
                 request.getSize(),
                 request.getAge(),
                 request.getWeight(),

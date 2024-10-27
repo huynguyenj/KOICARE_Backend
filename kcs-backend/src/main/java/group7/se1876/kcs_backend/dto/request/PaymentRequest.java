@@ -14,7 +14,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class PaymentRequest {
     int quantity;
-    int productId;
     long amount;
     String ipAddr;
 }

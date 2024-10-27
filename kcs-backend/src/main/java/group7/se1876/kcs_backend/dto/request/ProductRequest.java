@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -23,6 +24,6 @@ public class ProductRequest {
     @Min(1)
     private int quantity;
 
-    private String image;
+    private MultipartFile image;
     private String description;
 }
