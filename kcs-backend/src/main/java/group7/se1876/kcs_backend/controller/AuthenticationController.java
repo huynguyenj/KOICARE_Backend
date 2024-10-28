@@ -1,9 +1,7 @@
 package group7.se1876.kcs_backend.controller;
 
 import com.nimbusds.jose.JOSEException;
-import group7.se1876.kcs_backend.dto.request.AuthenticationRequest;
-import group7.se1876.kcs_backend.dto.request.LogoutRequest;
-import group7.se1876.kcs_backend.dto.request.VerifyTokenRequest;
+import group7.se1876.kcs_backend.dto.request.*;
 import group7.se1876.kcs_backend.dto.response.AuthenticationResponse;
 import group7.se1876.kcs_backend.dto.response.TrackingUserResponse;
 import group7.se1876.kcs_backend.dto.response.VerifyTokenResponse;
@@ -68,6 +66,23 @@ public class AuthenticationController {
         ApiResponse<TrackingUserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(authenticationService.countLoginUser());
 
+        return apiResponse;
+    }
+
+    //Check password
+    @PostMapping("/user/checkPass")
+    public ApiResponse<String> checkPass(@RequestBody CheckPasswordRequest request){
+
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(authenticationService.checkPassword(request));
+        return  apiResponse;
+    }
+
+    //Change password
+    @PatchMapping("/user/ChangePassword")
+    public ApiResponse<String> changePassword(@RequestBody ChangePasswordRequest request){
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(authenticationService.changePassoword(request));
         return apiResponse;
     }
 }

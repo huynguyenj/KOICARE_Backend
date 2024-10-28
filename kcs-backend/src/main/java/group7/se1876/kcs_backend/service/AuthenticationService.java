@@ -5,9 +5,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import group7.se1876.kcs_backend.dto.request.AuthenticationRequest;
-import group7.se1876.kcs_backend.dto.request.LogoutRequest;
-import group7.se1876.kcs_backend.dto.request.VerifyTokenRequest;
+import group7.se1876.kcs_backend.dto.request.*;
 import group7.se1876.kcs_backend.dto.response.AuthenticationResponse;
 import group7.se1876.kcs_backend.dto.response.TrackingUserResponse;
 import group7.se1876.kcs_backend.dto.response.VerifyTokenResponse;
@@ -229,5 +227,30 @@ public class AuthenticationService {
          return trackingUserResponse;
     }
 
+    public String checkPassword(CheckPasswordRequest request){
+
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new AppException((ErrorCode.INVALID_USERID)));
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        boolean checking = passwordEncoder.matches(request.getOldPassword(), user.getPassword());
+
+        if (checking){
+            return "correct";
+        }
+        return "wrong";
+    }
+
+    public String changePassoword(ChangePasswordRequest request){
+
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new AppException((ErrorCode.INVALID_USERID)));
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return "Cập nhật thành công";
+    }
 
 }

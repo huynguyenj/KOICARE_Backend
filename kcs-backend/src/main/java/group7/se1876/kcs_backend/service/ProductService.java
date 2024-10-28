@@ -102,13 +102,23 @@ public class ProductService {
         if (productCheck.getShop().getShopId() != shop.getShopId()) {
             throw new AppException(ErrorCode.DATA_NOT_EXISTED);
         }
+        // Upload image to Firebase
 
         Optional<Product> productOptional = productRepository.findById(id);
 
         if (productOptional.isEmpty()) {
             return Optional.empty();
         }
+
         Product product = productOptional.get();
+        if (productRequest.getImage() != null && !productRequest.getImage().isEmpty()) {
+            try {
+                String imageUrl = firebaseStorageService.uploadFile(productRequest.getImage(),"products/");
+                product.setImage(imageUrl);
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FAIL_UPLOADFILE);
+            }
+        }
         product.setProductName(productRequest.getProductName());
         product.setPrice(productRequest.getPrice());
         product.setCategory(productRequest.getCategory());
@@ -152,6 +162,7 @@ public class ProductService {
         Optional<Product> productOptional = productRepository.findById(id);
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
+
             // Perform hard delete by calling delete method of the repository
             productRepository.delete(product);
         } else {
@@ -181,7 +192,6 @@ public class ProductService {
             productRepository.save(product);
             // Tạo Order mới
             OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setProduct(product);
             orderDetail.setQuantity(item.getQuantity());
             orderDetail.setPrice(product.getPrice() * item.getQuantity());
             orderDetail.setAddress(request.getAddress());

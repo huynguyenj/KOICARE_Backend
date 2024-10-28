@@ -48,9 +48,9 @@ public class Product {
     @Column
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "product")
-    @Transient
-    private List<OrderDetail> orderDetails;
+//    @OneToMany(mappedBy = "product")
+//    @Transient
+//    private List<OrderDetail> orderDetails;
 
     @ManyToOne
     @JoinColumn(name = "shop_id")
