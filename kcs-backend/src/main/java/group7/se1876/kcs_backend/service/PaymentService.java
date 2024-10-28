@@ -179,7 +179,6 @@ public class PaymentService {
             transaction.setAmount((double) amount);
             transactionRepository.save(transaction);
 
-
             return true;
         } else {
             log.info("Response code is not 00. Actual response: {}", responseCode);

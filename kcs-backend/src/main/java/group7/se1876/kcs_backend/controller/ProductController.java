@@ -51,7 +51,7 @@ public class ProductController {
     }
 
     @PutMapping("/update/{productID}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable int productID, @RequestBody ProductRequest productRequest) {
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable int productID, @ModelAttribute ProductRequest productRequest) {
         Optional<ProductResponse> updatedProduct = productService.updateProduct(productID, productRequest);
         return updatedProduct.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -61,6 +61,7 @@ public class ProductController {
         productService.deleteProduct(productID);
         return ResponseEntity.ok("Product deleted successfully");
     }
+
 
 
     @PostMapping("/order")
