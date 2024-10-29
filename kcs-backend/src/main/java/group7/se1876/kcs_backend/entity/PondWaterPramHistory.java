@@ -1,24 +1,21 @@
 package group7.se1876.kcs_backend.entity;
 
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
-import java.util.List;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
+@Builder
 @Setter
-public class WaterParameter {
-
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PondWaterPramHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long parameterId;
+    private Long parameterHistoryId;
     private Date measurementTime;
     private double temperature;
     private double salinity;
@@ -28,9 +25,7 @@ public class WaterParameter {
     private double no3;
     private double po4;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pondId", referencedColumnName = "pondId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pond_id", referencedColumnName = "pondId")
     private Pond pond;
-
-
 }

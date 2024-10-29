@@ -1,6 +1,7 @@
 package group7.se1876.kcs_backend.controller;
 
 import group7.se1876.kcs_backend.dto.request.AddOrderDetail;
+import group7.se1876.kcs_backend.dto.request.OrderDetailPaymentError;
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.ErrorResponse;
 import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
@@ -77,5 +78,12 @@ public class ProductController {
     public ResponseEntity<ProductResponse> searchProduct(@PathVariable int productID) {
         Optional<ProductResponse> product = productService.searchProduct(productID);
         return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/deleteOrderPE")
+    public ApiResponse<String> deleteOrderPe(@RequestBody OrderDetailPaymentError request){
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productService.orderFailProduct(request));
+        return apiResponse;
     }
 }

@@ -177,7 +177,7 @@ public class PaymentService {
             transaction.setDate(new Date());
             transaction.setBankCode(params.get("vnp_BankCode"));
             transaction.setAmount((double) amount);
-            transactionRepository.save(transaction);
+    //            transactionRepository.save(transaction);
 
             return true;
         } else {

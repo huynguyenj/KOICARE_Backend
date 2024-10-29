@@ -42,4 +42,8 @@ public class Pond {
 
     @OneToOne(mappedBy = "pond", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private WaterParameter waterParameter;
+
+    @OneToMany(mappedBy = "pond", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PondWaterPramHistory> pondWaterParamsHistory;
+
 }

@@ -1,6 +1,7 @@
 package group7.se1876.kcs_backend.service;
 
 import group7.se1876.kcs_backend.dto.request.AddOrderDetail;
+import group7.se1876.kcs_backend.dto.request.OrderDetailPaymentError;
 import group7.se1876.kcs_backend.dto.request.OrderRequest;
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
 import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
@@ -224,5 +225,32 @@ public class ProductService {
         productResponse.setShopId(product.getShop().getShopId());
         return productResponse;
 
+    }
+
+    public String orderFailProduct(OrderDetailPaymentError request) {
+
+
+        for (OrderRequest item: request.getOrder()) {
+
+            Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+            Shop shop = shopRepository.findById(item.getShopId())
+                    .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+            //Cập nhật hàng tồn kho
+            product.setQuantity(product.getQuantity() + item.getQuantity());
+            productRepository.save(product);
+
+
+            for(Integer orderId: request.getOrderId()) {
+                orderDetailRepository.deleteById(orderId);
+            }
+
+
+
+
+        }
+        return "Delete success!";
     }
 }

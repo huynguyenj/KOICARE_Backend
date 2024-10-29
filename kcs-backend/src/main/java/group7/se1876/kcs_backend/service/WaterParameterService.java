@@ -2,14 +2,17 @@ package group7.se1876.kcs_backend.service;
 
 import group7.se1876.kcs_backend.dto.request.AddWaterParameterRequest;
 import group7.se1876.kcs_backend.dto.request.WaterParameterUpdateRequest;
+import group7.se1876.kcs_backend.dto.response.WaterParameterHistoryResponse;
 import group7.se1876.kcs_backend.dto.response.WaterParameterResponse;
 import group7.se1876.kcs_backend.entity.Pond;
+import group7.se1876.kcs_backend.entity.PondWaterPramHistory;
 import group7.se1876.kcs_backend.entity.WaterParameter;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.PondMapper;
 import group7.se1876.kcs_backend.repository.FishRepository;
 import group7.se1876.kcs_backend.repository.PondRepository;
+import group7.se1876.kcs_backend.repository.WaterHistoryRepository;
 import group7.se1876.kcs_backend.repository.WaterParameterRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +31,7 @@ public class WaterParameterService {
     private PondRepository pondRepository;
     private WaterParameterRepository waterParameterRepository;
     private PondMapper pondMapper;
-
+    private WaterHistoryRepository waterHistoryRepository;
 
     private static final double IDEAL_TEMPERATURE_MIN = 20.0;
     private static final double IDEAL_TEMPERATURE_MAX = 25.0;
@@ -64,6 +69,12 @@ public class WaterParameterService {
         WaterParameter waterParameter = pondMapper.mapToWaterParameter(request);
         waterParameter.setPond(pond);
         waterParameterRepository.save(waterParameter);
+
+        PondWaterPramHistory pondWaterPramHistory = pondMapper.mapToWaterParameterHistory(request);
+        pondWaterPramHistory.setPond(pond);
+        pond.getPondWaterParamsHistory().add(pondWaterPramHistory);
+        waterHistoryRepository.save(pondWaterPramHistory);
+
 
         return pondMapper.mapToWaterParameterResponse(waterParameter);
     }
@@ -166,6 +177,19 @@ public class WaterParameterService {
 
         waterParameterRepository.save(waterParameter);
 
+        PondWaterPramHistory pondWaterPramHistory = new PondWaterPramHistory();
+        pondWaterPramHistory.setMeasurementTime(new Date());
+        pondWaterPramHistory.setTemperature(request.getTemperature());
+        pondWaterPramHistory.setSalinity(request.getSalinity());
+        pondWaterPramHistory.setPh(request.getPh());
+        pondWaterPramHistory.setO2(request.getO2());
+        pondWaterPramHistory.setNo2(request.getNo2());
+        pondWaterPramHistory.setNo3(request.getNo3());
+        pondWaterPramHistory.setPo4(request.getPo4());
+        pondWaterPramHistory.setPond(pond);
+        pond.getPondWaterParamsHistory().add(pondWaterPramHistory);
+        waterHistoryRepository.save(pondWaterPramHistory);
+
         return pondMapper.mapToWaterParameterResponse(waterParameter);
 
     }
@@ -200,6 +224,24 @@ public class WaterParameterService {
         }
         return result;
     }
+
+
+    public List<WaterParameterHistoryResponse> getAllHistoryWaterParam(Long pondId){
+        Pond pond = pondRepository.findById(pondId)
+                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        if (userId != pond.getUser().getUserId()){
+            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+        }
+
+        List<PondWaterPramHistory> pondWaterPramHistories = pond.getPondWaterParamsHistory();
+
+        return pondWaterPramHistories.stream().map((history)
+                -> pondMapper.mapToWaterParamHistoryResponse(history)).collect(Collectors.toList());
+
+    }
+
 }
 
 
