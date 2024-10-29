@@ -178,7 +178,7 @@ public class WaterParameterService {
         waterParameterRepository.save(waterParameter);
 
         PondWaterPramHistory pondWaterPramHistory = new PondWaterPramHistory();
-        pondWaterPramHistory.setMeasurementTime(new Date());
+        pondWaterPramHistory.setMeasurementTime(request.getMeasurementTime());
         pondWaterPramHistory.setTemperature(request.getTemperature());
         pondWaterPramHistory.setSalinity(request.getSalinity());
         pondWaterPramHistory.setPh(request.getPh());
