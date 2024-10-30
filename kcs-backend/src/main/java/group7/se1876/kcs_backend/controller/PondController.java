@@ -6,6 +6,7 @@ import group7.se1876.kcs_backend.dto.request.AddWaterParameterRequest;
 import group7.se1876.kcs_backend.dto.request.PondUpdateRequest;
 import group7.se1876.kcs_backend.dto.request.WaterParameterUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.PondResponse;
+import group7.se1876.kcs_backend.dto.response.WaterParameterHistoryResponse;
 import group7.se1876.kcs_backend.dto.response.WaterParameterResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.PondService;
@@ -145,6 +146,15 @@ public class PondController {
         ApiResponse<Double> apiResponse = new ApiResponse<>();
         apiResponse.setResult(waterParameterService.saltCalculation(pondId,saltPercent));
 
+        return apiResponse;
+    }
+
+    //Get waterPram history
+    @GetMapping("/water_parameter/history/{pondId}")
+    public ApiResponse<List<WaterParameterHistoryResponse>> getHistory(@PathVariable("pondId") Long pondId){
+
+        ApiResponse<List<WaterParameterHistoryResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(waterParameterService.getAllHistoryWaterParam(pondId));
         return apiResponse;
     }
 

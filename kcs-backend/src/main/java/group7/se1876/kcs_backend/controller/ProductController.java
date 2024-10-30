@@ -1,24 +1,20 @@
 package group7.se1876.kcs_backend.controller;
 
 import group7.se1876.kcs_backend.dto.request.AddOrderDetail;
+import group7.se1876.kcs_backend.dto.request.OrderDetailPaymentError;
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
-import group7.se1876.kcs_backend.dto.response.ErrorResponse;
 import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
-import group7.se1876.kcs_backend.enums.CategoryProduct;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.exception.ProductAlreadyExistsException;
-import group7.se1876.kcs_backend.service.CloudinaryService;
 import group7.se1876.kcs_backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/product")
@@ -77,5 +73,12 @@ public class ProductController {
     public ResponseEntity<ProductResponse> searchProduct(@PathVariable int productID) {
         Optional<ProductResponse> product = productService.searchProduct(productID);
         return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/deleteOrderPE")
+    public ApiResponse<String> deleteOrderPe(@RequestBody OrderDetailPaymentError request){
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productService.orderFailProduct(request));
+        return apiResponse;
     }
 }

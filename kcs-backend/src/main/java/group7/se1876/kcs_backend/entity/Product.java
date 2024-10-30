@@ -1,11 +1,9 @@
 package group7.se1876.kcs_backend.entity;
 
-import group7.se1876.kcs_backend.enums.CategoryProduct;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Builder
@@ -29,8 +27,7 @@ public class Product {
     private int quantity;
 
     @Column
-    @Enumerated(EnumType.STRING)
-    private CategoryProduct category;
+    private String category;
 
     @Column
     private LocalDateTime createAt;
@@ -48,9 +45,6 @@ public class Product {
     @Column
     private boolean isDeleted;
 
-//    @OneToMany(mappedBy = "product")
-//    @Transient
-//    private List<OrderDetail> orderDetails;
 
     @ManyToOne
     @JoinColumn(name = "shop_id")
