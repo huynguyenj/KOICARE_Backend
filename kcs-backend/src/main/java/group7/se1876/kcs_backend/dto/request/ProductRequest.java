@@ -1,6 +1,5 @@
 package group7.se1876.kcs_backend.dto.request;
 
-import group7.se1876.kcs_backend.enums.CategoryProduct;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,7 +19,7 @@ public class ProductRequest {
     @Min(0)
     private double price;
     @NotNull
-    private CategoryProduct category;
+    private String category;
     @Min(1)
     private int quantity;
     private MultipartFile image;

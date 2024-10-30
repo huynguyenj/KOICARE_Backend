@@ -1,6 +1,5 @@
 package group7.se1876.kcs_backend.dto.response;
 
-import group7.se1876.kcs_backend.enums.CategoryProduct;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +16,7 @@ public class ProductResponse {
     private int id;
     private String productName;
     private double price;
-    private CategoryProduct category;
+    private String category;
     private int quantity;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
