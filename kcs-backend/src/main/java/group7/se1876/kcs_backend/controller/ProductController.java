@@ -3,8 +3,10 @@ package group7.se1876.kcs_backend.controller;
 import group7.se1876.kcs_backend.dto.request.AddOrderDetail;
 import group7.se1876.kcs_backend.dto.request.OrderDetailPaymentError;
 import group7.se1876.kcs_backend.dto.request.ProductRequest;
+import group7.se1876.kcs_backend.dto.request.RatingRequest;
 import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
+import group7.se1876.kcs_backend.dto.response.RatingResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.exception.ProductAlreadyExistsException;
 import group7.se1876.kcs_backend.service.ProductService;
@@ -79,6 +81,28 @@ public class ProductController {
     public ApiResponse<String> deleteOrderPe(@RequestBody OrderDetailPaymentError request){
         ApiResponse<String> apiResponse = new ApiResponse<>();
         apiResponse.setResult(productService.orderFailProduct(request));
+        return apiResponse;
+    }
+
+    @PostMapping("/rating/{productId}")
+    public ApiResponse<RatingResponse> postRating(@PathVariable("productId") int id,@ModelAttribute RatingRequest request){
+        ApiResponse<RatingResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productService.addRating(id,request));
+        return apiResponse;
+    }
+
+    @GetMapping("/rating/getAll/{productId}")
+    public ApiResponse<List<RatingResponse>> getAllRating(@PathVariable("productId") int id){
+        ApiResponse<List<RatingResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(productService.getAllRating(id));
+        return apiResponse;
+    }
+
+    @DeleteMapping("/rating/delete/{productId}/{userId}")
+    public ApiResponse<String> deleteRating(@PathVariable("productId")int id,@PathVariable("userId")Long userId){
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        productService.deleteRating(id,userId);
+        apiResponse.setResult("Delete success!");
         return apiResponse;
     }
 }

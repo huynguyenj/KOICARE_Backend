@@ -1,30 +1,24 @@
-package group7.se1876.kcs_backend.entity;
+package group7.se1876.kcs_backend.dto.response;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
-@Entity
-@Builder
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RatingProduct {
+public class RatingResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ratingId;
-    @Lob
-    @Column(columnDefinition = "text")
     private String content;
     private String image;
     private Date date;
     private int star;
     private String productName;
-    private Integer productId;
-    private Long userId;
     private String userName;
-
 }
