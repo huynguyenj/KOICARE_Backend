@@ -36,7 +36,7 @@ public class SecurityConfig {
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 
-    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register","/auth/logout","/payment/verify","/api/user/getAllBlogs","/api/user/getBlog/{blogId}"};
+    private final String[] PUBLIC_ENDPOINTS = {"/api/user","/auth/login","auth/verifyToken","/api/register","/auth/logout","/payment/verify","/api/user/getAllBlogs","/api/user/getBlog/{blogId}","/product/rating/getAll/{productId}"};
 //    private final String[] ADMIN_ENDPOINTS = {"/api/getUsers"};
 
     @Bean

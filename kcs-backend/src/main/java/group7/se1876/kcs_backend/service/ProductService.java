@@ -1,21 +1,14 @@
 package group7.se1876.kcs_backend.service;
 
-import group7.se1876.kcs_backend.dto.request.AddOrderDetail;
-import group7.se1876.kcs_backend.dto.request.OrderDetailPaymentError;
-import group7.se1876.kcs_backend.dto.request.OrderRequest;
-import group7.se1876.kcs_backend.dto.request.ProductRequest;
+import group7.se1876.kcs_backend.dto.request.*;
 import group7.se1876.kcs_backend.dto.response.OrderDetailResponse;
 import group7.se1876.kcs_backend.dto.response.ProductResponse;
-import group7.se1876.kcs_backend.entity.OrderDetail;
-import group7.se1876.kcs_backend.entity.Product;
-import group7.se1876.kcs_backend.entity.Shop;
-import group7.se1876.kcs_backend.entity.User;
+import group7.se1876.kcs_backend.dto.response.RatingResponse;
+import group7.se1876.kcs_backend.entity.*;
 import group7.se1876.kcs_backend.exception.*;
 import group7.se1876.kcs_backend.mapper.ShopMapper;
-import group7.se1876.kcs_backend.repository.OrderDetailRepository;
-import group7.se1876.kcs_backend.repository.ProductRepository;
-import group7.se1876.kcs_backend.repository.ShopRepository;
-import group7.se1876.kcs_backend.repository.UserRepository;
+import group7.se1876.kcs_backend.repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -52,6 +45,10 @@ public class ProductService {
 
     @Autowired
     private ShopMapper shopMapper;
+
+    @Autowired
+    private RatingRepository ratingRepository;
+
     public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -248,10 +245,55 @@ public class ProductService {
                 orderDetailRepository.deleteById(orderId);
             }
 
-
-
-
         }
         return "Delete success!";
+    }
+
+    public RatingResponse addRating(int productId, RatingRequest request){
+
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
+
+
+        Product productCheck = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_EXISTED));
+
+        RatingProduct ratingProduct = shopMapper.mapToRatingProduct(request);
+        ratingProduct.setProductId(productId);
+        ratingProduct.setProductName(productCheck.getProductName());
+        ratingProduct.setUserName(user.getUserName());
+        ratingProduct.setUserId(userId);
+        if(request.getDate()==null){
+            ratingProduct.setDate(new Date());
+        }
+        // Upload image to Firebase
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            try {
+                String imageUrl = firebaseStorageService.uploadFile(request.getImage(),"rating/");  // Corrected
+                ratingProduct.setImage(imageUrl);  // Assuming Pond entity has pondImg field
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FAIL_UPLOADFILE);
+            }
+        }
+
+        ratingRepository.save(ratingProduct);
+
+        return shopMapper.mapToRatingProductResponse(ratingProduct);
+
+    }
+
+    public List<RatingResponse> getAllRating(int productId){
+
+        List<RatingProduct> ratingResponseList = ratingRepository.findByProductId(productId);
+
+        return ratingResponseList.stream().map(r->shopMapper.mapToRatingProductResponse(r)).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteRating(int productId, Long userId){
+
+        ratingRepository.deleteByProductIdAndUserId(productId,userId);
+
     }
 }
