@@ -28,4 +28,6 @@ public class OrderDetailResponse {
     private String phone;
 
     private Date date;
+
+    private String productName;
 }

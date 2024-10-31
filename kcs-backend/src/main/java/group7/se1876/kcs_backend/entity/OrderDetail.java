@@ -47,4 +47,7 @@ public class OrderDetail {
     @JoinColumn(name = "shopId", referencedColumnName = "shopId")
     private Shop shop;
 
+    @Column
+    private String productName;
+
 }

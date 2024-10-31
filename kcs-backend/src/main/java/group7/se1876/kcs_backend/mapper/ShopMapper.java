@@ -45,7 +45,8 @@ public class ShopMapper {
                 orderDetail.getUserName(),
                 orderDetail.getAddress(),
                 orderDetail.getPhone(),
-                orderDetail.getDate()
+                orderDetail.getDate(),
+                orderDetail.getProductName()
         );
     }
 }

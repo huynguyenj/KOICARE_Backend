@@ -200,6 +200,7 @@ public class ProductService {
             orderDetail.setUserName(request.getUserName());
             orderDetail.setShop(shop);
             orderDetail.setDate(new Date());
+            orderDetail.setProductName(product.getProductName());
             // Lưu OrderDetail vào cơ sở dữ liệu
             orderDetailRepository.save(orderDetail);
 
