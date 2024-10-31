@@ -19,8 +19,8 @@ public class OrderDetailService {
     public void deleteOrderDetail(int id) {
         OrderDetail orderDetail = orderDetailRepository.findById(id).orElse(null);
         if (orderDetail != null) {
-            orderDetail.setDeleted(true);
-            orderDetailRepository.save(orderDetail);
+//            orderDetail.setDeleted(true);
+            orderDetailRepository.deleteById(id);
         }
     }
 }
