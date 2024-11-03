@@ -5,7 +5,7 @@ import group7.se1876.kcs_backend.dto.request.AddFishRequest;
 import group7.se1876.kcs_backend.dto.response.*;
 import group7.se1876.kcs_backend.entity.Fish;
 import group7.se1876.kcs_backend.entity.FishDevelopmentHistory;
-import group7.se1876.kcs_backend.entity.FoodCalculation;
+//import group7.se1876.kcs_backend.entity.FoodCalculation;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -31,8 +31,8 @@ public class FishMapper {
                 request.getPrice(),
                 null,
                 null,
-                null,
                 null
+
         );
     }
 
@@ -100,13 +100,13 @@ public class FishMapper {
 
     }
 
-    public static FoodCalculationResponse mapToFoodCalculationResponse(FoodCalculation foodCalculation){
-
-        return new FoodCalculationResponse(
-                foodCalculation.getCalculationId(),
-                foodCalculation.getFeed(),
-                foodCalculation.getFoodAmount(),
-                foodCalculation.getFish().getFishName()
-        );
-    }
+//    public static FoodCalculationResponse mapToFoodCalculationResponse(FoodCalculation foodCalculation){
+//
+//        return new FoodCalculationResponse(
+//                foodCalculation.getCalculationId(),
+//                foodCalculation.getFeed(),
+//                foodCalculation.getFoodAmount(),
+//                foodCalculation.getFish().getFishName()
+//        );
+//    }
 }

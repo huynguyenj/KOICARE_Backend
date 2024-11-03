@@ -113,17 +113,17 @@ public class WaterParameterService {
 
         // Check O2
         if (waterParameter.getO2() < IDEAL_O2_MIN || waterParameter.getO2() > IDEAL_O2_MAX) {
-            recommendations.put("RESOLVE_O2", "Bạn nên điều chỉnh nồng độ O2 giữa khoảng " + IDEAL_O2_MIN + " và " + IDEAL_O2_MAX + " mg/L.Bạn có thể dùng máy sục khí sẽ giúp tăng cường nồng độ oxy.");
+            recommendations.put("RESOLVE_O2", "Bạn nên điều chỉnh nồng độ O2 giữa khoảng " + IDEAL_O2_MIN + " và " + IDEAL_O2_MAX + " mg/L.Bạn có thể dùng máy sục khí sẽ giúp điều chỉnh nồng độ oxy.");
         }
 
         // Check NO2
         if (waterParameter.getNo2() > IDEAL_NO2_MAX) {
-            recommendations.put("RESOLVE_NO2", "Nồng độ NO2 nên ở  0.0 mg/L. Hãy thực hiện quy trình giảm lại lượng NO2. Hãy sử dụng bộ lọc sinh học để giảm lượng NO2.");
+            recommendations.put("RESOLVE_NO2", "Nồng độ NO2 nên ở  0.0 mg/L. Hãy thực hiện quy trình giảm lại lượng NO2. Hãy sử dụng bộ lọc sinh học để điều chỉnh NO2.");
         }
 
         // Check NO3
         if (waterParameter.getNo3() > IDEAL_NO3_MAX) {
-            recommendations.put("RESOLVE_NO3", "Bạn nên điều chỉnh nồng độ NO3 dưới " + IDEAL_NO3_MAX + " mg/L.Sử dụng cây thủy sinh hoặc bộ lọc NO3 để giảm nồng độ NO3.");
+            recommendations.put("RESOLVE_NO3", "Bạn nên điều chỉnh nồng độ NO3 dưới " + IDEAL_NO3_MAX + " mg/L.Sử dụng cây thủy sinh hoặc bộ lọc NO3 để điều chỉnh nồng độ NO3.");
         }
 
         // Check PO4
@@ -195,35 +195,35 @@ public class WaterParameterService {
     }
 
     //Salt calculation
-    public Double saltCalculation(Long pondId, String saltPercent){
-
-        Pond pond = pondRepository.findById(pondId)
-                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
-        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        if (userId != pond.getUser().getUserId()){
-            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
-        }
-
-        double volume = pond.getVolume();
-        System.out.println(volume);
-        double result = 0;
-
-        switch (saltPercent){
-            case "0.3":
-                result =  volume*0.003;
-                break;
-            case "0.5":
-                result =  volume*0.005;
-                break;
-            case "0.7":
-                result =  volume*0.007;
-                break;
-            default:
-                result = 0;
-        }
-        return result;
-    }
+//    public Double saltCalculation(Long pondId, String saltPercent){
+//
+//        Pond pond = pondRepository.findById(pondId)
+//                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+//        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+//
+//        if (userId != pond.getUser().getUserId()){
+//            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+//        }
+//
+//        double volume = pond.getVolume();
+//        System.out.println(volume);
+//        double result = 0;
+//
+//        switch (saltPercent){
+//            case "0.3":
+//                result =  volume*0.003;
+//                break;
+//            case "0.5":
+//                result =  volume*0.005;
+//                break;
+//            case "0.7":
+//                result =  volume*0.007;
+//                break;
+//            default:
+//                result = 0;
+//        }
+//        return result;
+//    }
 
 
     public List<WaterParameterHistoryResponse> getAllHistoryWaterParam(Long pondId){

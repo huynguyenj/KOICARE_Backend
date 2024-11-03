@@ -10,6 +10,7 @@ import group7.se1876.kcs_backend.mapper.ShopMapper;
 import group7.se1876.kcs_backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +50,7 @@ public class ProductService {
     @Autowired
     private RatingRepository ratingRepository;
 
+    @PreAuthorize("hasAuthority('ROLE_SHOP')")
     public ProductResponse createProduct(ProductRequest productRequest) throws ProductAlreadyExistsException {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -260,13 +262,11 @@ public class ProductService {
                 .orElseThrow(() -> new AppException(ErrorCode.DATA_NOT_EXISTED));
 
         RatingProduct ratingProduct = shopMapper.mapToRatingProduct(request);
-        ratingProduct.setProductId(productId);
-        ratingProduct.setProductName(productCheck.getProductName());
+        ratingProduct.setProduct(productCheck);
         ratingProduct.setUserName(user.getUserName());
         ratingProduct.setUserId(userId);
-        if(request.getDate()==null){
-            ratingProduct.setDate(new Date());
-        }
+        ratingProduct.setDate(new Date());
+
         // Upload image to Firebase
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             try {
