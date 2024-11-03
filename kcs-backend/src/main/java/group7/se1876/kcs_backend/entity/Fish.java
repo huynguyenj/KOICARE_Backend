@@ -39,6 +39,6 @@ public class Fish {
     private User owner;
     @OneToMany(mappedBy = "fish", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FishDevelopmentHistory> fishDevelopmentHistories;
-    @OneToMany(mappedBy = "fish", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<FoodCalculation> foodCalculations;
+//    @OneToMany(mappedBy = "fish", cascade = CascadeType.ALL,orphanRemoval = true)
+//    private List<FoodCalculation> foodCalculations;
 }

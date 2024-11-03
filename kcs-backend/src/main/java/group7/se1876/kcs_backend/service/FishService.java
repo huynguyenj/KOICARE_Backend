@@ -4,7 +4,7 @@ import group7.se1876.kcs_backend.dto.request.AddFishDevelopmentHistoryRequest;
 import group7.se1876.kcs_backend.dto.request.AddFishRequest;
 import group7.se1876.kcs_backend.dto.request.FishUpdateRequest;
 import group7.se1876.kcs_backend.dto.response.FishResponse;
-import group7.se1876.kcs_backend.dto.response.FoodCalculationResponse;
+//import group7.se1876.kcs_backend.dto.response.FoodCalculationResponse;
 import group7.se1876.kcs_backend.dto.response.KoiFishDevelopmentResponse;
 import group7.se1876.kcs_backend.entity.*;
 import group7.se1876.kcs_backend.exception.AppException;
@@ -12,7 +12,7 @@ import group7.se1876.kcs_backend.exception.ErrorCode;
 import group7.se1876.kcs_backend.mapper.FishMapper;
 import group7.se1876.kcs_backend.repository.FishHistoriesRepository;
 import group7.se1876.kcs_backend.repository.FishRepository;
-import group7.se1876.kcs_backend.repository.FoodCalculationRepository;
+//import group7.se1876.kcs_backend.repository.FoodCalculationRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,7 +32,7 @@ public class FishService {
     private FishMapper fishMapper;
     private UserRepository userRepository;
     private FishHistoriesRepository fishHistories;
-    private FoodCalculationRepository foodCalculationRepository;
+//    private FoodCalculationRepository foodCalculationRepository;
     private FirebaseStorageService firebaseStorageService;
 
 
@@ -196,61 +196,61 @@ public class FishService {
     }
 
     //Add Food Calculation
-    public FoodCalculationResponse addFoodCalculation(Long fishId){
-
-        Fish fish = fishRepository.findById(fishId)
-                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
-
-        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        if (!fish.getOwner().getUserId().equals(userId)){
-            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
-        }
-
-        FoodCalculation foodCalculation = new FoodCalculation();
-
-        int fishAge = fish.getFishAge();
-        double foodPercentage;
-
-        if (fishAge <= 1) {
-            // Young Fish
-            foodPercentage = 0.05; // 5% of weight
-        } else if (fishAge <= 3) {
-            // Juvenile Fish
-            foodPercentage = 0.03; // 3% of weight
-        } else {
-            // Adult Fish
-            foodPercentage = 0.015; // 1.5% of weight
-        }
-
-        double foodAmount = fish.getFishWeight() * foodPercentage;
-
-        foodCalculation.setFoodAmount(foodAmount);
-        foodCalculation.setFish(fish);
-        foodCalculation.setFeed(new Date());
-        foodCalculationRepository.save(foodCalculation);
-
-        fish.getFoodCalculations().add(foodCalculation);
-        fishRepository.save(fish);
-
-        return fishMapper.mapToFoodCalculationResponse(foodCalculation);
-    }
-
-    //Get all food calculation of fish
-    public List<FoodCalculationResponse> getAllFoodCalculation(Long fishId){
-
-        Fish fish = fishRepository.findById(fishId)
-                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
-
-        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        if (!fish.getOwner().getUserId().equals(userId)){
-            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
-        }
-
-        List<FoodCalculation> foodCalculations = fish.getFoodCalculations();
-
-        return foodCalculations.stream().map((food)-> fishMapper.mapToFoodCalculationResponse(food)).collect(Collectors.toList());
-    }
+//    public FoodCalculationResponse addFoodCalculation(Long fishId){
+//
+//        Fish fish = fishRepository.findById(fishId)
+//                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
+//
+//        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+//
+//        if (!fish.getOwner().getUserId().equals(userId)){
+//            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+//        }
+//
+//        FoodCalculation foodCalculation = new FoodCalculation();
+//
+//        int fishAge = fish.getFishAge();
+//        double foodPercentage;
+//
+//        if (fishAge <= 1) {
+//            // Young Fish
+//            foodPercentage = 0.05; // 5% of weight
+//        } else if (fishAge <= 3) {
+//            // Juvenile Fish
+//            foodPercentage = 0.03; // 3% of weight
+//        } else {
+//            // Adult Fish
+//            foodPercentage = 0.015; // 1.5% of weight
+//        }
+//
+//        double foodAmount = fish.getFishWeight() * foodPercentage;
+//
+//        foodCalculation.setFoodAmount(foodAmount);
+//        foodCalculation.setFish(fish);
+//        foodCalculation.setFeed(new Date());
+//        foodCalculationRepository.save(foodCalculation);
+//
+//        fish.getFoodCalculations().add(foodCalculation);
+//        fishRepository.save(fish);
+//
+//        return fishMapper.mapToFoodCalculationResponse(foodCalculation);
+//    }
+//
+//    //Get all food calculation of fish
+//    public List<FoodCalculationResponse> getAllFoodCalculation(Long fishId){
+//
+//        Fish fish = fishRepository.findById(fishId)
+//                .orElseThrow(()-> new AppException(ErrorCode.DATA_NOT_EXISTED));
+//
+//        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+//
+//        if (!fish.getOwner().getUserId().equals(userId)){
+//            throw new AppException(ErrorCode.INVALID_DATA_WITH_USERID);
+//        }
+//
+//        List<FoodCalculation> foodCalculations = fish.getFoodCalculations();
+//
+//        return foodCalculations.stream().map((food)-> fishMapper.mapToFoodCalculationResponse(food)).collect(Collectors.toList());
+//    }
 
 }

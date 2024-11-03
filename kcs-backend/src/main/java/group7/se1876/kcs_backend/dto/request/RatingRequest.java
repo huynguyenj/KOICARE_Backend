@@ -16,6 +16,5 @@ public class RatingRequest {
     private Long ratingId;
     private String content;
     private MultipartFile image;
-    private Date date;
     private int star;
 }

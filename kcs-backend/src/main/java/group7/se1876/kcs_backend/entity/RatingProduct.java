@@ -22,8 +22,9 @@ public class RatingProduct {
     private String image;
     private Date date;
     private int star;
-    private String productName;
-    private Integer productId;
+    @ManyToOne
+    @JoinColumn(name = "productId")
+    private Product product;
     private Long userId;
     private String userName;
 

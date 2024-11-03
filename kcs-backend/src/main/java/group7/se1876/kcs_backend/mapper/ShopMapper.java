@@ -59,9 +59,8 @@ public class ShopMapper {
                 request.getRatingId(),
                 request.getContent(),
                 null,
-                request.getDate(),
-                request.getStar(),
                 null,
+                request.getStar(),
                 null,
                 null,
                 null
@@ -76,7 +75,7 @@ public class ShopMapper {
                 request.getImage(),
                 request.getDate(),
                 request.getStar(),
-                request.getProductName(),
+                request.getProduct().getProductName(),
                 request.getUserName()
 
         );
