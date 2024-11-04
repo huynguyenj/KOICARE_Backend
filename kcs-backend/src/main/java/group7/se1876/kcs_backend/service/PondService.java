@@ -171,6 +171,20 @@ public class PondService {
             }
         }
 
+
+        double volume = pond.getVolume()*1000;
+        double maxKoi = volume/1000;
+
+        int amountKoi = 0;
+        for (Fish f: pond.getFish()){
+            amountKoi++;
+        }
+        System.out.println(amountKoi);
+
+        if (amountKoi > maxKoi){
+            throw new AppException(ErrorCode.LIMITED_AMOUNT);
+        }
+
         pond.getFish().add(fish);
         pondRepository.save(pond);
 
