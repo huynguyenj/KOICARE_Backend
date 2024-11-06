@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,5 +18,7 @@ public class TrackingUserLogin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long userId;
+    private Date loginTime;
+    private Date expiredTime;
 
 }

@@ -169,6 +169,15 @@ public class UserController {
         return apiResponse;
     }
 
+    //Delete blog
+    @DeleteMapping("/user/deleteBlog/{blogId}")
+    public ApiResponse<String> deleteBlog(@PathVariable("blogId") Long blogId){
 
+        ApiResponse<String> apiResponse = new ApiResponse<>();
+        blogService.deleteBlogByAdmin(blogId);
+        apiResponse.setResult("Delete successfully");
+
+        return apiResponse;
+    }
 
 }

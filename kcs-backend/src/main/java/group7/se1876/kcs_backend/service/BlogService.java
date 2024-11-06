@@ -124,7 +124,7 @@ public class BlogService {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         User user = userRepository.findById(userId)
-                .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
+                .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
 
         Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(()->new AppException(ErrorCode.DATA_NOT_EXISTED));
@@ -140,4 +140,8 @@ public class BlogService {
 
     }
 
+    //Delete blog
+    public void deleteBlogByAdmin(Long blogId){
+        blogRepository.deleteById(blogId);
+    }
 }
