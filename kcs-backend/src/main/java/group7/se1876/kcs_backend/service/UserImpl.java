@@ -91,14 +91,6 @@ public class UserImpl implements UserService {
         }
 
         User saveUser = userRepository.save(user);
-//        String token = UUID.randomUUID().toString();
-//        VerificationToken verificationToken = VerificationToken.builder()
-//                .token(token)
-//                .user(saveUser)
-//                .expiryDate(LocalDateTime.now().plusHours(24))
-//                .build();
-//        verificationTokenRepository.save(verificationToken);
-//        sendVerificationEmail(user.getUserName(), token);
 
         return UserMapper.mapToUserResponse(saveUser);
     }

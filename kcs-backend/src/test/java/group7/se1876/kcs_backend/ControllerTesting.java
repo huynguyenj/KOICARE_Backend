@@ -48,10 +48,11 @@ public class ControllerTesting {
                 3L,
                 "Jack",
                 "123456789",
-                Long.valueOf("0879197994"),
+                ("0879197994"),
                 "jacknguyen@gmail.com",
                 true
         );
+
 
         User user = userMapper.mapToUser(request);
 
@@ -67,12 +68,13 @@ public class ControllerTesting {
 
         String content = objectMapper.writeValueAsString(request);
 
-        Mockito.when(userService.register(ArgumentMatchers.any()))
+        Mockito.when(userService.register(ArgumentMatchers.any(),ArgumentMatchers.anyString()))
                         .thenReturn(userResponse);
         //When:
         mockMvc.perform(MockMvcRequestBuilders.post("/api/register") //
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(content))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .param("userRoleChoice","user")
+                        .content(content))
         //Assert:
                 .andExpect(MockMvcResultMatchers.status().isOk()) // expect that code run successfully
                 .andExpect(MockMvcResultMatchers.jsonPath("code") // expect that value return is fit with value expected
@@ -90,10 +92,10 @@ public class ControllerTesting {
     void getAllUsersTest() throws Exception {
         // Given: Set up mock data for the list of users
         UserResponse userResponse1 = new UserResponse(
-                1L, "Alice", 1234567890L, "alice@example.com", true, new HashSet<>()
+                1L, "Alice", "0987895601", "alice@example.com", true, new HashSet<>()
         );
         UserResponse userResponse2 = new UserResponse(
-                2L, "Bob", 1234567891L, "bob@example.com", true, new HashSet<>()
+                2L, "Bob", "0987894789", "bob@example.com", true, new HashSet<>()
         );
 
         List<UserResponse> userResponses = List.of(userResponse1, userResponse2);

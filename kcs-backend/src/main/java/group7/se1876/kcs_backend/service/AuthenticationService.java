@@ -7,6 +7,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import group7.se1876.kcs_backend.dto.request.*;
 import group7.se1876.kcs_backend.dto.response.AuthenticationResponse;
+import group7.se1876.kcs_backend.dto.response.TokenResponse;
 import group7.se1876.kcs_backend.dto.response.TrackingUserResponse;
 import group7.se1876.kcs_backend.dto.response.VerifyTokenResponse;
 import group7.se1876.kcs_backend.entity.InvalidatedToken;
@@ -66,20 +67,20 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENDICATED);
 
         //Create token for user
-        var token = generateToken(user);
+        TokenResponse token = generateToken(user);
         AuthenticationResponse authRes = new AuthenticationResponse();
 
-        authRes.setToken(token);
+        authRes.setToken(token.getToken());
         authRes.setAuthenticated(true);
 
-        trackingLogin(user.getUserId());
+        trackingLogin(user.getUserId(),token.getExpirationTime());
 
         return authRes;
 
     }
 
     //Create token
-    private String generateToken(User user){
+    private TokenResponse generateToken(User user){
 
         //Create header
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
@@ -105,7 +106,7 @@ public class AuthenticationService {
         //Sign token ( ensure that it cannot be modified and to prove that it was issued by a trusted party.)
         try {
             jwsObject.sign(new MACSigner(SIGNAL_KEY.getBytes()));
-            return jwsObject.serialize();
+            return new TokenResponse(jwsObject.serialize(), jwtClaimsSet.getExpirationTime());
         } catch (JOSEException e) {
             log.error("Cannot create token",e);
             throw new RuntimeException(e);
@@ -200,11 +201,12 @@ public class AuthenticationService {
     }
 
     //Tracking login
-    private void trackingLogin(Long userId){
+    private void trackingLogin(Long userId, Date expiredTime){
 
         TrackingUserLogin trackingUserLogin = new TrackingUserLogin();
         trackingUserLogin.setUserId(userId);
-
+        trackingUserLogin.setLoginTime(new Date());
+        trackingUserLogin.setExpiredTime(expiredTime);
         trackingUserRepository.save(trackingUserLogin);
     }
 
