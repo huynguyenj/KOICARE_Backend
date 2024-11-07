@@ -38,6 +38,7 @@ public class UserMapper {
                 null,
                 null,
                 null,
+                null,
                 null
         );
     }

@@ -89,7 +89,7 @@ public class ProductService {
         return convertToResponse(savedProduct);
     }
 
-
+    @PreAuthorize("hasAuthority('ROLE_SHOP')")
     public Optional<ProductResponse> updateProduct(int id, ProductRequest productRequest) {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -135,6 +135,7 @@ public class ProductService {
     }
 
     //For shop
+    @PreAuthorize("hasAuthority('ROLE_SHOP')")
     public List<ProductResponse> getAllProductsInShop() {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -147,6 +148,7 @@ public class ProductService {
         return products.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasAuthority('ROLE_SHOP')")
     public void deleteProduct(int id) {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());

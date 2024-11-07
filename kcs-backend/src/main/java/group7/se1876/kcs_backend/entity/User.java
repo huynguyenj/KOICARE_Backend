@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -48,4 +49,7 @@ public class User {
 
     @OneToOne(mappedBy = "ownerShop", cascade = CascadeType.ALL,orphanRemoval = true, fetch = FetchType.LAZY)
     private Shop shop;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions;
 }

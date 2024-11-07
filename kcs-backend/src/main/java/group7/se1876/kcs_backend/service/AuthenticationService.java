@@ -24,6 +24,7 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -201,6 +202,7 @@ public class AuthenticationService {
     }
 
     //Tracking login
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     private void trackingLogin(Long userId, Date expiredTime){
 
         TrackingUserLogin trackingUserLogin = new TrackingUserLogin();
@@ -211,6 +213,7 @@ public class AuthenticationService {
     }
 
     //Count login user at present
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public TrackingUserResponse countLoginUser(){
 
         Set<Long> uniqueUserIds = new HashSet<>();
