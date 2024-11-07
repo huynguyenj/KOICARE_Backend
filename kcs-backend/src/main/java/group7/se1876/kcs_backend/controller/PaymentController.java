@@ -2,6 +2,7 @@ package group7.se1876.kcs_backend.controller;
 
 
 import group7.se1876.kcs_backend.dto.request.PaymentRequest;
+import group7.se1876.kcs_backend.dto.response.PaymentHistory;
 import group7.se1876.kcs_backend.dto.response.TransactionHistoryResponse;
 import group7.se1876.kcs_backend.exception.ApiResponse;
 import group7.se1876.kcs_backend.service.PaymentService;
@@ -63,5 +64,13 @@ public class PaymentController {
                     .result("Payment verification failed!")
                     .build();
         }
+    }
+
+    @GetMapping("/getPaymentHistory")
+    public ApiResponse<List<PaymentHistory>> getPaymentHistory(){
+        ApiResponse<List<PaymentHistory>> apiResponse = new ApiResponse<>();
+        apiResponse.setResult(paymentService.getPaymentHistory());
+
+        return apiResponse;
     }
 }

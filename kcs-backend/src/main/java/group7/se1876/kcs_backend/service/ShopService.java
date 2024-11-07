@@ -29,6 +29,7 @@ public class ShopService {
     private UserRepository userRepository;
 
     //Create shop
+
     public ShopResponse createShop(CreateShopRequest shopRequest) {
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());

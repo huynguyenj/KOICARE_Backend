@@ -1,11 +1,13 @@
 package group7.se1876.kcs_backend.service;
 
 import group7.se1876.kcs_backend.dto.request.PaymentRequest;
+import group7.se1876.kcs_backend.dto.response.PaymentHistory;
 import group7.se1876.kcs_backend.dto.response.TransactionHistoryResponse;
 import group7.se1876.kcs_backend.entity.Transaction;
 import group7.se1876.kcs_backend.entity.User;
 import group7.se1876.kcs_backend.exception.AppException;
 import group7.se1876.kcs_backend.exception.ErrorCode;
+import group7.se1876.kcs_backend.mapper.PurchaseMapper;
 import group7.se1876.kcs_backend.repository.TransactionRepository;
 import group7.se1876.kcs_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 public class PaymentService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
-
+    private final PurchaseMapper purchaseMapper;
     private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
     String vnp_TmnCode = "C0DZPJH8";
     String vnp_HashSecret = "ZPQF7HG5PUJZVPPUG09WT6VFQ7X9GQAQ";
@@ -54,6 +56,7 @@ public class PaymentService {
 
     public String createPayment(PaymentRequest request) {
         try {
+
             Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
 
             Map<String, String> vnp_Params = new HashMap<>();
@@ -173,6 +176,7 @@ public class PaymentService {
             // Lưu giao dịch vào cơ sở dữ liệu
             Transaction transaction = new Transaction();
             transaction.setUsername(user.getUserName());
+            transaction.setUser(user);
             transaction.setDetails(params.get("vnp_OrderInfo"));
             transaction.setDate(new Date());
             transaction.setBankCode(params.get("vnp_BankCode"));
@@ -207,5 +211,15 @@ public class PaymentService {
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
+    }
+
+    public List<PaymentHistory> getPaymentHistory(){
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new AppException(ErrorCode.INVALID_USERID));
+
+        List<Transaction> paymentHistory = user.getTransactions();
+
+        return paymentHistory.stream().map((p)-> purchaseMapper.mapToPaymentHistory(p)).collect(Collectors.toList());
     }
 }
