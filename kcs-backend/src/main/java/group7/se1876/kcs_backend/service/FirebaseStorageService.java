@@ -35,7 +35,7 @@ public class FirebaseStorageService {
 
         System.out.println("Uploading to bucket: " + bucketName);
         System.out.println("File path: " + objectName);
-
+        System.out.println(fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                 .setContentType(file.getContentType())
                 .build();

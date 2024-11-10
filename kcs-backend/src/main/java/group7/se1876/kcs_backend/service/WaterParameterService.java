@@ -54,7 +54,7 @@ public class WaterParameterService {
     public WaterParameterResponse addWaterParameterForPond(Long pondId, AddWaterParameterRequest request){
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
-
+        System.out.println(pondId);
         Pond pond = pondRepository.findById(pondId)
                 .orElseThrow(()->new AppException(ErrorCode.INVALID_DATA_WITH_USERID));
 
